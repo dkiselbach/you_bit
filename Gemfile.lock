@@ -91,7 +91,14 @@ GEM
     ffi (1.14.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
+    graphiql-rails (1.7.0)
+      railties
+      sprockets-rails
     graphql (1.11.6)
+    graphql_devise (0.13.5)
+      devise_token_auth (>= 0.1.43, < 2.0)
+      graphql (>= 1.8, < 1.12.0)
+      rails (>= 4.2, < 6.2)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     listen (3.3.3)
@@ -197,7 +204,9 @@ DEPENDENCIES
   devise
   devise_token_auth!
   dotenv-rails
+  graphiql-rails
   graphql
+  graphql_devise
   listen (~> 3.3)
   pg (~> 1.1)
   puma (~> 5.0)

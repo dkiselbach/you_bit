@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-class User < ApplicationRecord
+class Admin < ActiveRecord::Base
   # Include default devise modules. Others available are:
-  # :lockable, :timeoutable, and :omniauthable
+  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable,
-         :confirmable
-
+         :recoverable, :rememberable, :validatable
   include GraphqlDevise::Concerns::Model
 end

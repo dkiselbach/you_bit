@@ -28,11 +28,13 @@ gem 'bootsnap', '>= 1.4.4', require: false
 # gem 'rack-cors'
 
 # Graphql
+gem 'graphiql-rails'
 gem 'graphql'
 
 # Authentication
 gem 'devise'
 gem 'devise_token_auth', github: 'lynndylanhurley/devise_token_auth'
+gem 'graphql_devise'
 
 # Test
 gem 'rspec-rails'
