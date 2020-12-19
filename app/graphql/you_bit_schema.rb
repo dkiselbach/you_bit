@@ -6,7 +6,7 @@ class YouBitSchema < GraphQL::Schema
     mutation: Types::MutationType,
     authenticate_default: false,
     resource_loaders: [
-      GraphqlDevise::ResourceLoader.new('User', { at: 'graphql' })
+      GraphqlDevise::ResourceLoader.new('User', { at: 'graphql', operations: { sign_up: Mutations::SignUp }, skip: %i[confirm_account] })
     ]
   )
 
