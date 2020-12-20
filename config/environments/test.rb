@@ -1,4 +1,6 @@
-require "active_support/core_ext/integer/time"
+# frozen_string_literal: true
+
+require 'active_support/core_ext/integer/time'
 
 # The test environment is used exclusively to run your application's
 # test suite. You never need to work with it otherwise. Remember that
@@ -51,6 +53,10 @@ Rails.application.configure do
 
   # Tell Active Support which deprecation messages to disallow.
   config.active_support.disallowed_deprecation_warnings = []
+
+  # Background jobs
+  config.active_job.queue_adapter = :test
+  config.active_job.queue_name_prefix = 'YOUbit_development'
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true

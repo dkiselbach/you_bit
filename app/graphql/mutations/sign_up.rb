@@ -7,8 +7,7 @@ module Mutations
     field :user, Types::UserType, null: true
 
     def resolve(email:, **attrs)
-      original_payload = super
-      original_payload.merge(user: original_payload[:authenticable])
+      super
     end
   end
 end
