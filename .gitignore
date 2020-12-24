@@ -29,4 +29,6 @@
 # Env file
 .env
 
+.idea/*
+
 .DS_Store
