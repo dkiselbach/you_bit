@@ -1,38 +1,39 @@
 # frozen_string_literal: true
 
 module Mutations
+  # Class responsible for handling user sign up. The resolver method will return the user object and the associated
+  # credentials for login
   class SignUp < BaseMutation
-    argument :name, String, required: true
-    argument :email, String, required: true
-    argument :password,              String, required: true
-    argument :password_confirmation, String, required: true
+    description 'Sign up a user with name and email. This will will return the
+user object and the associated credentials for login.'
+    argument :name, String, required: true, description: 'Name of the user'
+    argument :email, String, required: true, description: 'Email of the user.
+This email will need to be valid to receive reset password emails'
+    argument :password, String, required: true, description: 'Password for the user.'
+    argument :password_confirmation, String, required: true, description: 'Password confirmation that must match the
+password.'
 
     field :credentials,
           Types::UserCredentialType,
           null: true,
-          description: 'Authentication credentials. Null if after signUp resource is not active for authentication (e.g. Email confirmation required).'
+          description: 'Authentication credentials for the user. Null if after signUp resource is not active for
+ authentication (e.g. Email confirmation required).'
 
-    field :user, Types::UserType, null: true, description: "Access the user's fields if sign up is successful."
+    field :user, Types::UserType, null: true, description: 'The newly signed up user fields.'
 
     def resolve(**attrs)
-      resource = build_resource(attrs.merge(provider: provider))
-      raise_user_error(I18n.t('graphql_devise.resource_build_failed')) if resource.blank?
+      user = build_resource(attrs.merge(provider: provider))
+      raise_user_error(I18n.t('graphql_devise.resource_build_failed')) if user.blank?
 
-      if resource.save
-        yield resource if block_given?
-
-        response_payload = { authenticatable: resource }
-
-        response_payload[:credentials] = set_auth_headers(resource) if resource.active_for_authentication?
-
-        response_payload.merge(user: resource)
-      else
-        resource.try(:clean_up_passwords)
-        raise_user_error_list(
-          I18n.t('graphql_devise.registration_failed'),
-          errors: resource.errors.full_messages
-        )
+      if user.save
+        return { user: user, credentials: user.active_for_authentication? ? set_auth_headers(user) : nil }
       end
+
+      user.try(:clean_up_passwords)
+      raise_user_error_list(
+        I18n.t('graphql_devise.registration_failed'),
+        errors: user.errors.full_messages
+      )
     end
 
     private

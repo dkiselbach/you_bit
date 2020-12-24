@@ -1,0 +1,8 @@
+require:
+  - rubocop-rspec
+  - rubocop-rails
+  - rubocop-performance
+
+Metrics/BlockLength:
+  Exclude:
+    - '**/*_spec.rb'
