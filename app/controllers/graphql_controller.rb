@@ -12,7 +12,7 @@ class GraphqlController < ApplicationController
     operation_name = params[:operationName]
     context = {
       # Query context goes here, for example:
-      # current_user: current_user,
+      current_user: graphql_context(:user)
     }
     result = YouBitSchema.execute(query, variables: variables, context: graphql_context(:user), operation_name: operation_name)
     render json: result
@@ -49,5 +49,9 @@ class GraphqlController < ApplicationController
     logger.error e.backtrace.join("\n")
 
     render json: { errors: [{ message: e.message, backtrace: e.backtrace }], data: {} }, status: 500
+  end
+
+  def resource_name
+    'User'
   end
 end

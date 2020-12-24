@@ -1,8 +1,4 @@
-Welcome to the Habit Tracker YOUbit, <%= @user.name %>
-===============================================
-
-You have successfully signed up, your username is: <%= @user.email %>
-
-To login to the site, just follow this link: <%= @url %>.
-
-Thanks for joining and have a great day!
+<%=t('.welcome_msg')%> <%= @user.name %>
+<%=t('.successful_sign_up_msg')%> <%= @user.email %>
+<%=t('.login_url_msg')%> <%= @url %>
+<%=t('.thank_you_msg')%>

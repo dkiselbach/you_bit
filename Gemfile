@@ -31,7 +31,6 @@ gem 'bootsnap', '>= 1.4.4', require: false
 # gem 'rack-cors'
 
 # Graphql
-gem 'graphiql-rails'
 gem 'graphql'
 
 # Authentication
@@ -50,6 +49,11 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'faker'
   gem 'rspec-rails'
+
+  # formatting
+  gem 'htmlbeautifier'
+  gem 'rubocop'
+  gem 'solargraph'
 end
 
 group :development do
