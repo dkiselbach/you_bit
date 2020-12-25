@@ -18,14 +18,14 @@ module Mutations
       it 'returns password reset message' do
         message = 'You will receive an email with instructions on how to reset your password in a few minutes.'
         post '/graphql', params: { query: send_password_mutation(@email) }
-        message = JSON.parse(response.body).dig('data', 'userSendPasswordReset', 'message')
-        expect(message).to eq(message)
+        response_message = JSON.parse(response.body).dig('data', 'userSendPasswordReset', 'message')
+        expect(response_message).to eq(message)
       end
 
       it 'returns an error if email is invalid' do
         post '/graphql', params: { query: send_password_mutation('invalid@example.com') }
 
-        error_message = JSON.parse(response.body).dig('errors')[0].dig('message')
+        error_message = JSON.parse(response.body).dig('errors', 0, 'message')
 
         expect(error_message).to eq('User was not found or was not logged in.')
       end

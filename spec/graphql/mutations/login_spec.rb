@@ -23,7 +23,6 @@ module Mutations
 
         expect(user_email).to eq(@email)
       end
-
     end
   end
 end

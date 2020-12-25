@@ -16,10 +16,11 @@ module Mutations
       user.send_reset_password_instructions(email: email, provider: 'email', redirect_url: nil,
                                             template_path: ['user_mailer'],
                                             schema_url: controller.full_url_without_params)
+      if user.errors.empty?
+        return { message: I18n.t('graphql_devise.passwords.send_instructions') }
+      end
 
-      raise_user_error_list(I18n.t('graphql_devise.invalid_resource'), errors: user.errors.full_messages) if user.errors
-
-      { message: I18n.t('graphql_devise.passwords.send_instructions') }
+      raise_user_error_list(I18n.t('graphql_devise.invalid_resource'), errors: user.errors.full_messages)
     end
   end
 end

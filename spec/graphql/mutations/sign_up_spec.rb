@@ -32,7 +32,7 @@ module Mutations
       it 'returns an error if email is already taken' do
         post '/graphql', params: { query: sign_up_mutation(@name, @email, @password) }
 
-        error_message = JSON.parse(response.body).dig('errors')[0].dig('extensions', 'detailed_errors')[0]
+        error_message = JSON.parse(response.body).dig('errors', 0, 'extensions', 'detailed_errors', 0)
 
         expect(error_message).to eq('Email has already been taken')
       end
