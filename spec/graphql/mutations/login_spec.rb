@@ -23,6 +23,18 @@ module Mutations
 
         expect(user_email).to eq(@email)
       end
+
+      it 'returns password error' do
+        post '/graphql', params: { query: sign_in_mutation(@email, 'invalid') }
+        error_message = JSON.parse(response.body).dig('errors', 0, 'extensions', 'detailed_errors', 'password', 0)
+        expect(error_message).to eq('is incorrect.')
+      end
+
+      it 'returns email error' do
+        post '/graphql', params: { query: sign_in_mutation('invalid', @password) }
+        error_message = JSON.parse(response.body).dig('errors', 0, 'extensions', 'detailed_errors', 'email', 0)
+        expect(error_message).to eq('does not exist.')
+      end
     end
   end
 end

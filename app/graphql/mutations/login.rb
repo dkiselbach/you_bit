@@ -5,7 +5,7 @@ module Mutations
   class Login < Mutations::BaseMutation
     description "Login a user with email and password. This will return the user object and the associated
  credentials for login."
-    argument :email,    String, required: true
+    argument :email, String, required: true
     argument :password, String, required: true
 
     field :user, Types::UserType, null: false, description: "Access the user's fields if login is successful."
@@ -23,7 +23,10 @@ module Mutations
 
       if resource && active_for_authentication?(resource)
         if invalid_for_authentication?(resource, password)
-          raise_user_error(I18n.t('graphql_devise.sessions.bad_credentials'))
+          raise_user_error_list(
+            I18n.t('graphql_devise.sessions.bad_password'),
+            errors: I18n.t('graphql_devise.errors.bad_password')
+          )
         end
 
         new_headers = set_auth_headers(resource)
@@ -39,7 +42,10 @@ module Mutations
           raise_user_error(I18n.t('graphql_devise.sessions.not_confirmed', email: resource.email))
         end
       else
-        raise_user_error(I18n.t('graphql_devise.sessions.bad_credentials'))
+        raise_user_error_list(
+          I18n.t('graphql_devise.sessions.bad_email'),
+          errors: I18n.t('graphql_devise.errors.bad_email')
+        )
       end
     end
 

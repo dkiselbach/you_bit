@@ -32,7 +32,7 @@ password.'
       user.try(:clean_up_passwords)
       raise_user_error_list(
         I18n.t('graphql_devise.registration_failed'),
-        errors: user.errors.full_messages
+        errors: user.errors.messages
       )
     end
 

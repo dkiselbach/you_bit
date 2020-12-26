@@ -9,7 +9,6 @@ module Mutations
         @name = Faker::Name.name
         @email = Faker::Internet.email
         @password = Faker::Internet.password
-
         post '/graphql', params: { query: sign_up_mutation(@name, @email, @password) }
         @response_body = JSON.parse(response.body).dig('data', 'userSignUp')
       end
@@ -32,9 +31,9 @@ module Mutations
       it 'returns an error if email is already taken' do
         post '/graphql', params: { query: sign_up_mutation(@name, @email, @password) }
 
-        error_message = JSON.parse(response.body).dig('errors', 0, 'extensions', 'detailed_errors', 0)
+        error_message = JSON.parse(response.body).dig('errors', 0, 'extensions', 'detailed_errors', 'email', 0)
 
-        expect(error_message).to eq('Email has already been taken')
+        expect(error_message).to eq('has already been taken')
       end
     end
   end

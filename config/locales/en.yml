@@ -96,8 +96,12 @@ en:
       reset_token_expired: 'Reset password token is no longer valid.'
       send_instructions: 'You will receive an email with instructions on how to reset your password in a few minutes.'
     sessions:
-      bad_credentials: 'Invalid login credentials. Please try again.'
+      bad_email: 'Email provided does not correspond to a valid user.'
+      bad_password: 'Incorrect password provided. Please try again.'
       not_confirmed: "A confirmation email was sent to your account at '%{email}'. You must follow the instructions in the email before your account can be activated"
+    errors:
+      bad_password: { "password": ['is incorrect.'] }
+      bad_email: { "email": ['does not exist.'] }
     confirmations:
       already_confirmed: 'Email was already confirmed, please try signing in'
       invalid_token: 'Invalid confirmation token. Please try again'
