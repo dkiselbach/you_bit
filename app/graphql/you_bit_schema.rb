@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# YOUbit main GraphQL schema
+# you_bit main GraphQL schema
 class YouBitSchema < GraphQL::Schema
   use GraphqlDevise::SchemaPlugin.new(
     query: Types::QueryType,
