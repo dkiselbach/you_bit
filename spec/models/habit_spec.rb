@@ -40,4 +40,10 @@ RSpec.describe Habit, type: :model do
                                frequency: 'hourly', start_date: Time.now.utc)
     expect(habit.errors.messages[:frequency][0]).to include('daily')
   end
+
+  it 'active defaults to true if invalid boolean' do
+    habit = user.habits.create(name: Faker::Alphanumeric.alpha(number: 10), habit_type: 'limit',
+                               frequency: 'daily', active: 'not_a_boolean', start_date: Time.now.utc)
+    expect(habit.active).to be_truthy
+  end
 end
