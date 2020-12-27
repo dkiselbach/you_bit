@@ -6,12 +6,13 @@ class Habit < ApplicationRecord
                                                      message: "Must be one of: #{frequency_options}" }
   validates :start_date, presence: true
   validate :start_date_is_valid_datetime
+  belongs_to :user
 
   private
 
   def start_date_is_valid_datetime
-    Date.parse(start_date)
+    Date.parse(start_date.to_s)
   rescue
-    errors.add(:start_date, 'Start date must be a valid date')
+    errors.add(:start_date, 'must be a valid date')
   end
 end

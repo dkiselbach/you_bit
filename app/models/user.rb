@@ -7,6 +7,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
   include GraphqlDevise::Concerns::Model
   after_create :send_welcome_email
+  has_many :habits, dependent: :destroy
 
   private
 

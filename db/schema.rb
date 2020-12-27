@@ -17,12 +17,14 @@ ActiveRecord::Schema.define(version: 2020_12_26_210433) do
 
   create_table "habits", force: :cascade do |t|
     t.string "name", limit: 50, null: false
+    t.bigint "user_id", null: false
     t.string "description"
     t.string "habit_type", default: "goal", null: false
     t.string "frequency", default: "daily", null: false
     t.date "start_date", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_habits_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -46,4 +48,5 @@ ActiveRecord::Schema.define(version: 2020_12_26_210433) do
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
+  add_foreign_key "habits", "users"
 end
