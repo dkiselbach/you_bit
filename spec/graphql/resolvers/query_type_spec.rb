@@ -2,8 +2,8 @@
 
 require 'rails_helper'
 
-module Resolvers
-  RSpec.describe 'Habit Index', type: :request do
+module Types
+  RSpec.describe QueryType, type: :request do
     describe '.resolve' do
       let(:user) { user_with_habits }
       let(:args) do
@@ -11,11 +11,10 @@ module Resolvers
       end
       let(:auth_headers) { user.create_new_auth_token }
 
-      it 'returns credentials' do
-        user.habits.first.frequency = ['monday']
+      it 'returns daily habits' do
         post '/graphql', params: { query: habits_index_query(**args) }, headers: auth_headers
-        access_token = JSON.parse(response.body).dig('data', 'habitsIndex', 'name')
-        expect(access_token).to be_a(String)
+        habits_array = JSON.parse(response.body).dig('data', 'habitIndex')
+        expect(habits_array.length).to eq(5)
       end
     end
   end
@@ -24,7 +23,7 @@ end
 def habits_index_query(**args)
   <<~GQL
     query {
-      habitsIndex(frequency: #{args[:frequency]}", active: #{args[:active]}) {
+      habitIndex(daysOfWeek: #{args[:frequency]}, active: #{args[:active]}) {
         name
         description
         startDate

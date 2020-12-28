@@ -12,19 +12,24 @@ module Mutations
       end
       let(:auth_headers) { user.create_new_auth_token }
 
-      it 'destroy a habit returns destroyed habit' do
+      it 'returns destroyed habit' do
         habit = user.habits.first
-        request.headers = user.create_new_auth_token
-        post '/graphql', params: { query: destroy_habit_mutation(habit.id) }
-        habit_name = JSON.parse(response.body).dig('data', 'updateHabit', 'habit', 'name')
+        post '/graphql', params: { query: destroy_habit_mutation(habit.id) }, headers: auth_headers
+        habit_name = JSON.parse(response.body).dig('data', 'destroyHabit', 'habit', 'name')
         expect(habit_name).to eq(habit.name)
       end
 
-      it 'destroyed habit is removed from database' do
+      it 'is removed from database' do
         habit = user.habits.first
-        request.headers = user.create_new_auth_token
-        post '/graphql', params: { query: destroy_habit_mutation(habit.id) }
-        expect(user.habits.find(habit.id)).to raise_error
+        post '/graphql', params: { query: destroy_habit_mutation(habit.id) }, headers: auth_headers
+        expect(user.habits.find_by(id: habit.id)).to be_nil
+      end
+
+      it 'UserInputError is thrown' do
+        habit_id = user.habits.last.id + 1
+        post '/graphql', params: { query: destroy_habit_mutation(habit_id) }, headers: auth_headers
+        error_message = JSON.parse(response.body).dig('errors', 0, 'extensions', 'detailed_errors', 'id', 0)
+        expect(error_message).to eq('is invalid')
       end
     end
   end
@@ -33,7 +38,7 @@ end
 def destroy_habit_mutation(habit_id)
   <<~GQL
     mutation {
-    destroyHabit(id: #{habit_id}) {
+    destroyHabit(habitId: #{habit_id}) {
         habit {
           id
           name

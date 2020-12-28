@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Habit, type: :model do
-  let(:user) { create(:user) }
+  let(:user) { user_with_habits }
 
   it 'name must be less then 50 characters ' do
     habit = user.habits.create(name: Faker::Alphanumeric.alpha(number: 51), habit_type: 'goal',
@@ -45,5 +45,21 @@ RSpec.describe Habit, type: :model do
     habit = user.habits.create(name: Faker::Alphanumeric.alpha(number: 10), habit_type: 'limit',
                                frequency: ['daily'], active: 'not_a_boolean', start_date: Time.now.utc)
     expect(habit.active).to be_truthy
+  end
+
+  it 'active scope sorts by active' do
+    expect(user.habits.active.size).to be(5)
+  end
+
+  it 'active scope sorts by inactive' do
+    user.habits.first.toggle(:active).save
+    expect(user.habits.inactive.size).to be(1)
+  end
+
+  it 'active scope sorts by with_certain_days' do
+    certain_days = %w[monday daily]
+    user.habits.first.update(frequency: ['monday'])
+    user.habits.second.update(frequency: ['tuesday'])
+    expect(user.habits.with_certain_days(certain_days).size).to be(4)
   end
 end

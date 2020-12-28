@@ -102,6 +102,7 @@ en:
     errors:
       bad_password: { "password": ['is incorrect'] }
       bad_email: { "email": ['does not exist'] }
+      bad_id: { "id": ['is invalid'] }
     confirmations:
       already_confirmed: 'Email was already confirmed, please try signing in'
       invalid_token: 'Invalid confirmation token. Please try again'

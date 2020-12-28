@@ -11,7 +11,6 @@ module Errors
     end
 
     def to_h
-      byebug
       super.merge(extensions: { code: 'USER_INPUT_ERROR', detailed_errors: @errors })
     end
   end
