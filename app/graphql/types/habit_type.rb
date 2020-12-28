@@ -7,7 +7,7 @@ module Types
     field :name, String, null: false, description: 'The Name of the Habit.'
     field :description, String, null: true, description: 'The Description of the Habit.'
     field :habit_type, String, null: false, description: "The Habit Type. This is either 'goal' or 'limit'."
-    field :frequency, String, null: false, description: 'The Habit Frequency.'
+    field :frequency, [String], null: false, description: 'The Habit Frequency.'
     field :start_date, GraphQL::Types::ISO8601Date, null: false, description: 'The Habit Start Date.'
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false,
                                                         description: 'The DateTime value of when the Habit was created.'

@@ -8,7 +8,7 @@ module Mutations
       let(:user) { user_with_habits }
       let(:args) do
         { name: 'Run every day', description: 'Run everyday in the evening',
-          type: 'goal', frequency: 'daily', start_date: Date.new }
+          type: 'goal', frequency: ['daily'], start_date: Date.new }
       end
       let(:auth_headers) { user.create_new_auth_token }
 
@@ -38,7 +38,7 @@ def create_habit_mutation(**args)
   <<~GQL
     mutation {
     createHabit(name: "#{args[:name]}", description: "#{args[:description]}",
-      habitType: "#{args[:type]}", frequency: "#{args[:frequency]}",
+      habitType: "#{args[:type]}", frequency: #{args[:frequency]},
       startDate: "#{args[:start_date]}") {
         habit {
           id

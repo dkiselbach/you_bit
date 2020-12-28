@@ -12,8 +12,8 @@ module Mutations
     argument :description, String, required: false, description: 'The Description of the Habit.'
     argument :habit_type, String, required: false,
                                   description: "The Habit Type. This is either 'goal' or 'limit'. Defaults to 'goal'."
-    argument :frequency, String, required: true,
-                                 description: "The Habit Frequency. This is one of: #{frequency_options}."
+    argument :frequency, [String], required: true,
+                                   description: "The Habit Frequency. This is one of: #{frequency_options}."
     argument :start_date, GraphQL::Types::ISO8601Date, required: true, description: 'The Habit Start Date.'
 
     def resolve(**attrs)

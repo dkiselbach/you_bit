@@ -3,7 +3,7 @@ FactoryBot.define do
     name { Faker::Company.bs }
     description { Faker::Quote.yoda }
     habit_type { 'goal' }
-    frequency { 'daily' }
+    frequency { ['daily'] }
     start_date { Date.new.to_s }
     user
   end
