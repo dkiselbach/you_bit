@@ -18,14 +18,14 @@ module Mutations
         expect(Habit.find(habit_id).name).to eq(args[:name])
       end
 
-      it 'creates a habit with invalid params returns error' do
+      it 'with invalid params returns error' do
         args[:type] = 'goals'
         post '/graphql', params: { query: create_habit_mutation(**args) }, headers: auth_headers
         error_message = JSON.parse(response.body).dig('errors', 0, 'extensions', 'detailed_errors', 'habit_type', 0)
         expect(error_message).to eq("Must be either 'goal' or 'limit'")
       end
 
-      it 'creates a habit with no auth returns error' do
+      it 'with no auth returns error' do
         post '/graphql', params: { query: create_habit_mutation(**args) }
         error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
         expect(error_code).to eq('AUTHENTICATION_ERROR')

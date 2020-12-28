@@ -3,7 +3,7 @@
 module Mutations
   # Destroys a habit for a user.
   class DestroyHabit < BaseMutation
-    description 'Mutation for deleting a Habit for a user.'
+    description 'Deletes a Habit for a user.'
 
     field :habit, Types::HabitType, null: false, description: 'The information for the habit you deleted.'
     argument :habit_id, ID, required: true, description: 'The ID of the Habit.'

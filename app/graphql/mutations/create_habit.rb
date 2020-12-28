@@ -3,10 +3,10 @@
 module Mutations
   # Creates a habit for a user.
   class CreateHabit < BaseMutation
-    description 'Mutation for creating a Habit for a user.'
+    description 'Creates a Habit for a user.'
     frequency_options = %w[daily monday tuesday wednesday thursday friday saturday sunday]
 
-    field :habit, Types::HabitType, null: false, description: 'The information for the habit you created.'
+    field :habit, Types::HabitType, null: false, description: 'The information for the Habit you created.'
 
     argument :name, String, required: true, description: 'The Name of the Habit.'
     argument :description, String, required: false, description: 'The Description of the Habit.'
