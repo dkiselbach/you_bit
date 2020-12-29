@@ -3,21 +3,21 @@
 require 'rails_helper'
 
 module Mutations
-  RSpec.describe CreateHabit, type: :request do
+  RSpec.describe CreateHabitLog, type: :request do
     describe '.resolve' do
       let(:user) { create_user_with_habits }
       let(:args) do
-        { name: 'Run every day', description: 'Run everyday in the evening',
-          type: 'goal', frequency: ['daily'], start_date: Date.new }
+        { habit_id: Habit.first.id, logged_date: Date.new }
       end
       let(:auth_headers) { user.create_new_auth_token }
 
-      it 'creates a habit' do
+      it 'creates a habit log' do
         post '/graphql', params: { query: create_habit_mutation(**args) }, headers: auth_headers
         habit_id = JSON.parse(response.body).dig('data', 'createHabit', 'habit', 'id')
         expect(Habit.find(habit_id).name).to eq(args[:name])
       end
 
+      describe ''
       it 'with invalid params returns error' do
         args[:type] = 'goals'
         post '/graphql', params: { query: create_habit_mutation(**args) }, headers: auth_headers
@@ -34,12 +34,10 @@ module Mutations
   end
 end
 
-def create_habit_mutation(**args)
+def create_habit_log_mutation(**args)
   <<~GQL
     mutation {
-    createHabit(name: "#{args[:name]}", description: "#{args[:description]}",
-      habitType: "#{args[:type]}", frequency: #{args[:frequency]},
-      startDate: "#{args[:start_date]}") {
+    createHabitLog(habitId: "#{args[:habit_id]}", loggedDate: "#{args[:logged_date]}") {
         habit {
           id
           name

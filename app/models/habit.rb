@@ -3,23 +3,17 @@
 # Habit model
 class Habit < ApplicationRecord
   validates :name, presence: true, length: { maximum: 50 }
-  validates :habit_type, presence: true, inclusion: { in: %w[goal limit], message: "Must be either 'goal' or 'limit'" }
+  validates :habit_type, presence: true, habit_type: true
   validates :active, inclusion: { in: [true, false] }
-  validates :start_date, presence: true
-  validate :start_date_is_valid_datetime
+  validates :start_date, date: true, presence: true
   validate :frequency_is_valid
   belongs_to :user
+  has_many :habit_logs, dependent: :destroy
   scope :active, -> { where(active: true) }
   scope :inactive, -> { where(active: false ) }
   scope :with_certain_days, ->(certain_days) { where('frequency && ARRAY[?]', certain_days) }
 
   private
-
-  def start_date_is_valid_datetime
-    Date.parse(start_date.to_s)
-  rescue
-    errors.add(:start_date, 'must be a valid date')
-  end
 
   def frequency_is_valid
     return unless frequency

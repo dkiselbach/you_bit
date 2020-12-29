@@ -5,7 +5,7 @@ require 'rails_helper'
 module Types
   RSpec.describe QueryType, type: :request do
     describe '.resolve' do
-      let(:user) { user_with_habits }
+      let(:user) { create_user_with_habits }
       let(:args) do
         { frequency: ['daily'], active: true }
       end
