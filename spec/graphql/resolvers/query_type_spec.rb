@@ -7,12 +7,14 @@ module Types
     describe '.resolve' do
       let!(:user) { create_user_with_habits }
       let(:args) do
-        { frequency: ['daily'], active: true, selected_date: '2020-12-28' }
+        { frequency: ['daily'], active: true, selected_date: '2020-12-29' }
       end
       let(:auth_headers) { user.create_new_auth_token }
 
       before do
-        create_habit_with_logs(5, user.habits.first)
+        %w[2020-12-29 2020-12-30 2020-12-31 2021-01-01 2021-01-02].each do |date|
+          FactoryBot.create(:habit_log, logged_date: date, habit: user.habits.first)
+        end
       end
 
       it 'returns daily habits' do
@@ -32,6 +34,19 @@ module Types
         is_logged = JSON.parse(response.body).dig('data', 'habitIndex', 0, 'isLogged')
         expect(is_logged).to be_truthy
       end
+
+      it 'returns longest streak for habit' do
+        post '/graphql', params: { query: habits_index_query(**args) }, headers: auth_headers
+        longest_streak = JSON.parse(response.body).dig('data', 'habitIndex', 0, 'longestStreak', 'habitStreak')
+        expect(longest_streak).to eq(5)
+      end
+
+      it 'returns current streak for habit' do
+        args[:selected_date] = '2020-12-31'
+        post '/graphql', params: { query: habits_index_query(**args) }, headers: auth_headers
+        current_streak = JSON.parse(response.body).dig('data', 'habitIndex', 0, 'currentStreak', 'habitStreak')
+        expect(current_streak).to eq(3)
+      end
     end
   end
 end
@@ -45,6 +60,16 @@ def habits_index_query(**args)
         startDate
         active
         isLogged(selectedDate: "#{args[:selected_date]}")
+        longestStreak {
+          habitStreak
+          startDate
+          endDate
+        }
+        currentStreak(selectedDate: "#{args[:selected_date]}") {
+          habitStreak
+          startDate
+          endDate
+        }
         habitLogs {
           id
           loggedDate

@@ -5,6 +5,12 @@ require 'rails_helper'
 RSpec.describe Habit, type: :model do
   let!(:user) { create_user_with_habits }
 
+  before do
+    %w[2020-12-29 2020-12-30 2020-12-31 2021-01-01 2021-01-02].each do |date|
+      FactoryBot.create(:habit_log, logged_date: date, habit: user.habits.first)
+    end
+  end
+
   it 'name must be less then 50 characters ' do
     habit = user.habits.create(name: Faker::Alphanumeric.alpha(number: 51), habit_type: 'goal',
                                frequency: ['daily'], start_date: Time.now.utc)
@@ -64,7 +70,6 @@ RSpec.describe Habit, type: :model do
   end
 
   it 'delete habit should delete logs' do
-    create_habit_with_logs(5, user.habits.first)
     expect { described_class.first.destroy }.to change(HabitLog, :count).by(-5)
   end
 
@@ -80,5 +85,15 @@ RSpec.describe Habit, type: :model do
     create_habit_with_logs(1, habit)
     be_logged = habit.logged?('2020-12-27')
     expect(be_logged).to be_falsey
+  end
+
+  it 'current_streak returns correct streak' do
+    habit_streak = user.habits.first.current_streak('2020-12-31')['habit_streak']
+    expect(habit_streak).to eq(3)
+  end
+
+  it 'longest_streak returns correct streak' do
+    habit_streak = user.habits.first.longest_streak['habit_streak']
+    expect(habit_streak).to eq(5)
   end
 end
