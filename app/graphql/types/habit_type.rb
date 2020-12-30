@@ -14,8 +14,12 @@ module Types
                                                         description: 'The DateTime value of when the Habit was created.'
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false,
                                                         description: 'The DateTime value of when the Habit was updated.'
-    field :habit_logs, [Types::HabitLogType], null: true, description: 'Logs for the habit.'
-    field :is_logged, Boolean, null: false, description: 'If the habit has been logged.' do
+    field :habit_logs, [Types::HabitLogType], null: true, description: 'Logs for the Habit.'
+    field :is_logged, Boolean, null: false, description: 'If the Habit has been Logged.' do
+      argument :selected_date, GraphQL::Types::ISO8601Date, required: true
+    end
+    field :longest_streak, Types::StreakType, null: true, description: 'The Longest Streak for the habit.'
+    field :current_streak, Types::StreakType, null: true, description: 'The Longest Streak for the habit.'do
       argument :selected_date, GraphQL::Types::ISO8601Date, required: true
     end
 
@@ -25,6 +29,14 @@ module Types
 
     def is_logged(**args)
       @object.logged?(args[:selected_date])
+    end
+
+    def longest_streak
+      @object.longest_streak
+    end
+
+    def current_streak(**args)
+      @object.current_streak(args[:selected_date])
     end
   end
 end

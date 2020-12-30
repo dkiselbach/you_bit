@@ -14,4 +14,9 @@ RSpec.describe HabitLog, type: :model do
     habit_log = Habit.first.habit_logs.create(habit_type: 'goal', logged_date: "12/31/2020")
     expect(habit_log.errors.messages[:logged_date][0]).to eq('must be a valid date')
   end
+
+  it 'most_recent scope returns most recent log' do
+    habit_log = Habit.first.habit_logs.create(habit_type: 'goal', logged_date: Time.zone.today)
+    expect(Habit.first.habit_logs.most_recent.logged_date).to eq(habit_log.logged_date)
+  end
 end
