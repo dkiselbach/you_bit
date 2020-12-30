@@ -20,7 +20,7 @@ module Models
     end
 
     it 'delete habit should delete logs' do
-      create_habit_with_logs(5, user, user.habits.first)
+      create_habit_with_logs(5, user.habits.first)
       expect { described_class.first.destroy }.to change(HabitLog, :count).by(-5)
     end
   end

@@ -6,6 +6,6 @@ def create_user_with_habits(habits_count: 5)
   end
 end
 
-def create_habit_with_logs(logs_count, user, habit)
-  FactoryBot.create_list(:habit_log, logs_count, user: user, habit: habit)
+def create_habit_with_logs(logs_count, habit)
+  FactoryBot.create_list(:habit_log, logs_count, habit: habit)
 end

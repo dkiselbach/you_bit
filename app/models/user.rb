@@ -8,7 +8,6 @@ class User < ApplicationRecord
   include GraphqlDevise::Concerns::Model
   after_create :send_welcome_email
   has_many :habits, dependent: :destroy
-  has_many :habit_logs, dependent: :destroy
 
   private
 

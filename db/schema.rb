@@ -17,13 +17,11 @@ ActiveRecord::Schema.define(version: 2020_12_28_233109) do
 
   create_table "habit_logs", force: :cascade do |t|
     t.bigint "habit_id", null: false
-    t.bigint "user_id", null: false
     t.date "logged_date", null: false
     t.string "habit_type", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["habit_id"], name: "index_habit_logs_on_habit_id"
-    t.index ["user_id"], name: "index_habit_logs_on_user_id"
   end
 
   create_table "habits", force: :cascade do |t|
@@ -61,6 +59,5 @@ ActiveRecord::Schema.define(version: 2020_12_28_233109) do
   end
 
   add_foreign_key "habit_logs", "habits"
-  add_foreign_key "habit_logs", "users"
   add_foreign_key "habits", "users"
 end

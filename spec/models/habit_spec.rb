@@ -64,7 +64,21 @@ RSpec.describe Habit, type: :model do
   end
 
   it 'delete habit should delete logs' do
-    create_habit_with_logs(5, user, user.habits.first)
+    create_habit_with_logs(5, user.habits.first)
     expect { described_class.first.destroy }.to change(HabitLog, :count).by(-5)
+  end
+
+  it 'logged? returns true for logged habit' do
+    habit = user.habits.first
+    create_habit_with_logs(1, habit)
+    be_logged = habit.logged?('2020-12-28')
+    expect(be_logged).to be_truthy
+  end
+
+  it 'logged? returns false for logged habit' do
+    habit = user.habits.first
+    create_habit_with_logs(1, habit)
+    be_logged = habit.logged?('2020-12-27')
+    expect(be_logged).to be_falsey
   end
 end

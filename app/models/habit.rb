@@ -13,6 +13,11 @@ class Habit < ApplicationRecord
   scope :inactive, -> { where(active: false ) }
   scope :with_certain_days, ->(certain_days) { where('frequency && ARRAY[?]', certain_days) }
 
+
+  def logged?(selected_date)
+    habit_logs.where(logged_date: selected_date).exists?
+  end
+
   private
 
   def frequency_is_valid

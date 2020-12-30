@@ -18,7 +18,7 @@ module Types
     end
 
     def habit_index(**args)
-      Queries::HabitIndex.new(current_resource).index_by(args[:active], args[:days_of_week])
+      Queries::HabitIndex.new(current_resource).index(args[:active], args[:days_of_week])
     end
   end
 end

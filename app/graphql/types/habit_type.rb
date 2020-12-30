@@ -14,5 +14,17 @@ module Types
                                                         description: 'The DateTime value of when the Habit was created.'
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false,
                                                         description: 'The DateTime value of when the Habit was updated.'
+    field :habit_logs, [Types::HabitLogType], null: true, description: 'Logs for the habit.'
+    field :is_logged, Boolean, null: false, description: 'If the habit has been logged.' do
+      argument :selected_date, GraphQL::Types::ISO8601Date, required: true
+    end
+
+    def habit_logs
+      @object.habit_logs.order('logged_date DESC')
+    end
+
+    def is_logged(**args)
+      @object.logged?(args[:selected_date])
+    end
   end
 end
