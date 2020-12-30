@@ -5,11 +5,7 @@ require 'rails_helper'
 module Mutations
   RSpec.describe DestroyHabit, type: :request do
     describe '.resolve' do
-      let(:user) { user_with_habits }
-      let(:args) do
-        { name: 'Run every day', description: 'Run everyday in the evening',
-          type: 'goal', frequency: 'daily', start_date: Date.new }
-      end
+      let(:user) { create_user_with_habits }
       let(:auth_headers) { user.create_new_auth_token }
 
       it 'returns destroyed habit' do

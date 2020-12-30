@@ -6,5 +6,7 @@ module Types
     field :create_habit, mutation: Mutations::CreateHabit, authenticate: true
     field :destroy_habit, mutation: Mutations::DestroyHabit, authenticate: true
     field :update_habit, mutation: Mutations::UpdateHabit, authenticate: true
+    field :create_habit_log, mutation: Mutations::CreateHabitLog, authenticate: true
+    field :destroy_habit_log, mutation: Mutations::DestroyHabitLog, authenticate: true
   end
 end

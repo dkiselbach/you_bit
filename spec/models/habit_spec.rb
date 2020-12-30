@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Habit, type: :model do
-  let(:user) { user_with_habits }
+  let!(:user) { create_user_with_habits }
 
   it 'name must be less then 50 characters ' do
     habit = user.habits.create(name: Faker::Alphanumeric.alpha(number: 51), habit_type: 'goal',
@@ -14,12 +14,12 @@ RSpec.describe Habit, type: :model do
   it 'must have start_date' do
     habit = user.habits.create(name: Faker::Alphanumeric.alpha(number: 10), habit_type: 'goal',
                                frequency: ['daily'])
-    expect(habit.errors.messages[:start_date][0]).to eq("can't be blank")
+    expect(habit.errors.messages[:start_date][1]).to eq("can't be blank")
   end
 
   it 'start_date must be valid date format' do
     habit = user.habits.create(name: Faker::Alphanumeric.alpha(number: 10), habit_type: 'goal',
-                               frequency: ['daily'], start_date: 0)
+                               frequency: ['daily'], start_date: '12/31/2020')
     expect(habit.errors.messages[:start_date][0]).to eq('must be a valid date')
   end
 
@@ -61,5 +61,24 @@ RSpec.describe Habit, type: :model do
     user.habits.first.update(frequency: ['monday'])
     user.habits.second.update(frequency: ['tuesday'])
     expect(user.habits.with_certain_days(certain_days).size).to be(4)
+  end
+
+  it 'delete habit should delete logs' do
+    create_habit_with_logs(5, user.habits.first)
+    expect { described_class.first.destroy }.to change(HabitLog, :count).by(-5)
+  end
+
+  it 'logged? returns true for logged habit' do
+    habit = user.habits.first
+    create_habit_with_logs(1, habit)
+    be_logged = habit.logged?('2020-12-28')
+    expect(be_logged).to be_truthy
+  end
+
+  it 'logged? returns false for logged habit' do
+    habit = user.habits.first
+    create_habit_with_logs(1, habit)
+    be_logged = habit.logged?('2020-12-27')
+    expect(be_logged).to be_falsey
   end
 end

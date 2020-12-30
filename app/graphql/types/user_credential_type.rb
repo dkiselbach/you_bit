@@ -2,7 +2,7 @@
 
 module Types
   class UserCredentialType < GraphqlDevise::Types::CredentialType
-    field :user, Types::UserType, null: true, method: :uid, description: 'User associated with the credentials.'
+    field :user, Types::UserType, null: false, method: :uid, description: 'User associated with the credentials.'
 
     def user
       User.find_by(email: uid)
