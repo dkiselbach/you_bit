@@ -33,6 +33,13 @@ module Mutations
         expect(error_message).to eq("Must be either 'goal' or 'limit'")
       end
 
+      it 'with invalid id returns error' do
+        args[:habit_id] = Habit.last.id + 100
+        post '/graphql', params: { query: create_habit_log_mutation(**args) }, headers: auth_headers
+        error_message = JSON.parse(response.body).dig('errors', 0, 'message')
+        expect(error_message).to eq('Habit not found')
+      end
+
       it 'with no auth returns error' do
         post '/graphql', params: { query: create_habit_log_mutation(**args) }
         error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
