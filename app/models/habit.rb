@@ -17,6 +17,14 @@ class Habit < ApplicationRecord
     habit_logs.where(logged_date: selected_date).exists?
   end
 
+  def logged(selected_date)
+    habit_log = habit_logs.find_by(logged_date: selected_date)
+    {
+      habit_log: habit_log,
+      logged: habit_log.present?
+    }
+  end
+
   def longest_streak
     LONGEST_STREAK_QUERY
 

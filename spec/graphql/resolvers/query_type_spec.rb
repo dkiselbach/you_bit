@@ -31,8 +31,14 @@ module Types
 
       it 'returns logged for habit' do
         post '/graphql', params: { query: habits_index_query(**args) }, headers: auth_headers
-        is_logged = JSON.parse(response.body).dig('data', 'habitIndex', 0, 'isLogged')
+        is_logged = JSON.parse(response.body).dig('data', 'habitIndex', 0, 'isLogged', 'logged')
         expect(is_logged).to be_truthy
+      end
+
+      it 'returns habit log for logged' do
+        post '/graphql', params: { query: habits_index_query(**args) }, headers: auth_headers
+        habit_log = JSON.parse(response.body).dig('data', 'habitIndex', 0, 'isLogged', 'habitLog')
+        expect(habit_log['id'].to_i).to eq(HabitLog.find_by(logged_date: '2020-12-29').id)
       end
 
       it 'returns longest streak for habit' do
@@ -59,7 +65,12 @@ def habits_index_query(**args)
         description
         startDate
         active
-        isLogged(selectedDate: "#{args[:selected_date]}")
+        isLogged(selectedDate: "#{args[:selected_date]}") {
+          logged
+          habitLog {
+            id
+          }
+        }
         longestStreak {
           habitStreak
           startDate

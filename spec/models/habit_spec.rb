@@ -80,11 +80,25 @@ RSpec.describe Habit, type: :model do
     expect(be_logged).to be_truthy
   end
 
+  it 'logged returns hash for logged habit' do
+    habit = user.habits.first
+    create_habit_with_logs(1, habit)
+    be_logged = habit.logged('2020-12-28')
+    expect(be_logged[:habit_log].id).to eq(habit.habit_logs.last.id)
+  end
+
   it 'logged? returns false for logged habit' do
     habit = user.habits.first
     create_habit_with_logs(1, habit)
     be_logged = habit.logged?('2020-12-27')
     expect(be_logged).to be_falsey
+  end
+
+  it 'logged returns nil for not logged habit' do
+    habit = user.habits.first
+    create_habit_with_logs(1, habit)
+    be_logged = habit.logged('2020-12-27')
+    expect(be_logged[:habit_log]).to be_nil
   end
 
   it 'current_streak returns correct streak' do
