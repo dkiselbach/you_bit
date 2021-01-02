@@ -166,7 +166,7 @@ RSpec.describe Habit, type: :model do
   end
 
   describe '.create' do
-    subject(:create_habit) { create(:habit, category_name: 'Foo', active: 'not_a_boolean') }
+    subject(:create_habit) { create(:habit, category_name: 'foo', active: 'not_a_boolean') }
 
     context 'when category does not exist' do
       it 'creates a category' do
@@ -176,7 +176,7 @@ RSpec.describe Habit, type: :model do
 
     context 'when category does exist' do
       it 'uses category' do
-        Category.create(name: 'Foo')
+        Category.create(name: 'foo')
         expect { create_habit }.not_to change(Category, :count)
       end
     end
