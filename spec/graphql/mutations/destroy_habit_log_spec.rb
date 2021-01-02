@@ -10,42 +10,43 @@ module Mutations
       let(:auth_headers) { user.create_new_auth_token }
       let(:forbidden_auth_headers) { forbidden_user.create_new_auth_token }
 
-      before do
-        create_habit_with_logs(5, user.habits.first)
+      let(:habits) { create_habit_with_logs(5, user.habits.first) }
+
+      context 'with valid habit ID' do
+        it 'returns destroyed habit log' do
+          post '/graphql', params: { query: destroy_habit_log_mutation(habits.last.id) }, headers: auth_headers
+          habit_log_id = JSON.parse(response.body).dig('data', 'destroyHabitLog', 'habitLog', 'id')
+          expect(habit_log_id.to_i).to eq(habits.last.id)
+        end
+
+        it 'habit log is removed from database' do
+          post '/graphql', params: { query: destroy_habit_log_mutation(habits.last.id) }, headers: auth_headers
+          expect(HabitLog.find_by(id: habits.last.id)).to be_nil
+        end
       end
 
-      it 'returns destroyed habit log' do
-        habit_log = HabitLog.first
-        post '/graphql', params: { query: destroy_habit_log_mutation(habit_log.id) }, headers: auth_headers
-        habit_log_id = JSON.parse(response.body).dig('data', 'destroyHabitLog', 'habitLog', 'id')
-        expect(habit_log_id.to_i).to eq(habit_log.id)
+      context 'with invalid ID' do
+        it 'UserInputError is raised' do
+          post '/graphql', params: { query: destroy_habit_log_mutation(habits.last.id + 100) }, headers: auth_headers
+          error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
+          expect(error_code).to eq('USER_INPUT_ERROR')
+        end
       end
 
-      it 'habit log is removed from database' do
-        habit_log = HabitLog.first
-        post '/graphql', params: { query: destroy_habit_log_mutation(habit_log.id) }, headers: auth_headers
-        expect(HabitLog.find_by(id: habit_log.id)).to be_nil
+      context 'with user without access to habit' do
+        it 'ForbiddenError is raised' do
+          post '/graphql', params: { query: destroy_habit_log_mutation(habits.last.id) }, headers: forbidden_auth_headers
+          error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
+          expect(error_code).to eq('FORBIDDEN_ERROR')
+        end
       end
 
-      it 'with incorrect ID UserInputError is raised' do
-        habit_log_id = HabitLog.last.id + 100
-        post '/graphql', params: { query: destroy_habit_log_mutation(habit_log_id) }, headers: auth_headers
-        error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
-        expect(error_code).to eq('USER_INPUT_ERROR')
-      end
-
-      it 'with user without access to habit ForbiddenError is raised' do
-        habit_log_id = HabitLog.last.id
-        post '/graphql', params: { query: destroy_habit_log_mutation(habit_log_id) }, headers: forbidden_auth_headers
-        error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
-        expect(error_code).to eq('FORBIDDEN_ERROR')
-      end
-
-      it 'with no auth returns error' do
-        habit_log_id = HabitLog.last.id
-        post '/graphql', params: { query: destroy_habit_log_mutation(habit_log_id) }
-        error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
-        expect(error_code).to eq('AUTHENTICATION_ERROR')
+      context 'with not logged in user' do
+        it 'returns error' do
+          post '/graphql', params: { query: destroy_habit_log_mutation(habits.last.id) }
+          error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
+          expect(error_code).to eq('AUTHENTICATION_ERROR')
+        end
       end
     end
   end

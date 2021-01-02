@@ -28,16 +28,16 @@ module Types
       @object.habit_logs.order('logged_date DESC')
     end
 
-    def is_logged(**args)
-      @object.logged(args[:selected_date])
+    def is_logged(selected_date:)
+      @object.logged(selected_date: selected_date)
     end
 
     def longest_streak
       @object.longest_streak
     end
 
-    def current_streak(**args)
-      @object.current_streak(args[:selected_date])
+    def current_streak(selected_date:)
+      @object.current_streak(selected_date: selected_date)
     end
   end
 end

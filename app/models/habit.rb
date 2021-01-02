@@ -16,11 +16,11 @@ class Habit < ApplicationRecord
   scope :with_certain_days, ->(certain_days) { where('frequency && ARRAY[?]', certain_days) }
   before_validation :check_category
 
-  def logged?(selected_date)
+  def logged?(selected_date:)
     habit_logs.where(logged_date: selected_date).exists?
   end
 
-  def logged(selected_date)
+  def logged(selected_date:)
     habit_log = habit_logs.find_by(logged_date: selected_date)
     {
       habit_log: habit_log,
@@ -36,7 +36,7 @@ class Habit < ApplicationRecord
     ActiveRecord::Base.connection.execute(sql).first
   end
 
-  def current_streak(selected_date)
+  def current_streak(selected_date:)
     CURRENT_STREAK_QUERY
 
     sql = ActiveRecord::Base.sanitize_sql_array([CURRENT_STREAK_QUERY, id, selected_date, selected_date])

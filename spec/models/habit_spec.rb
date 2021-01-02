@@ -114,7 +114,7 @@ RSpec.describe Habit, type: :model do
       it 'returns true' do
         habit = user.habits.first
         create_habit_with_logs(1, habit)
-        be_logged = habit.logged?('2020-12-28')
+        be_logged = habit.logged?(selected_date: '2020-12-28')
         expect(be_logged).to be_truthy
       end
     end
@@ -123,7 +123,7 @@ RSpec.describe Habit, type: :model do
       it 'returns false' do
         habit = user.habits.first
         create_habit_with_logs(1, habit)
-        be_logged = habit.logged?('2020-12-27')
+        be_logged = habit.logged?(selected_date: '2020-12-27')
         expect(be_logged).to be_falsey
       end
     end
@@ -134,7 +134,7 @@ RSpec.describe Habit, type: :model do
       it 'returns hash' do
         habit = user.habits.first
         create_habit_with_logs(1, habit)
-        be_logged = habit.logged('2020-12-28')
+        be_logged = habit.logged(selected_date: '2020-12-28')
         expect(be_logged[:habit_log].id).to eq(habit.habit_logs.last.id)
       end
     end
@@ -143,7 +143,7 @@ RSpec.describe Habit, type: :model do
       it 'returns nil' do
         habit = user.habits.first
         create_habit_with_logs(1, habit)
-        be_logged = habit.logged('2020-12-27')
+        be_logged = habit.logged(selected_date: '2020-12-27')
         expect(be_logged[:habit_log]).to be_nil
       end
     end
@@ -152,7 +152,7 @@ RSpec.describe Habit, type: :model do
   describe '.current_streak' do
     it 'returns correct streak' do
       date = generate_habit_log_dates.third
-      habit_streak = user.habits.first.current_streak(date)['habit_streak']
+      habit_streak = user.habits.first.current_streak(selected_date: date)['habit_streak']
       expect(habit_streak).to eq(3)
     end
   end

@@ -12,13 +12,27 @@ module Types
       argument :active, Boolean, required: false,
                                  description: 'Specify if the habit is currently active. Defaults to true.'
     end
+    field :categories_index, [Types::CategoryType], null: false, authenticate: true,
+                                                    description: 'Returns the Categories of the signed in User.'
+    field :habit, Types::HabitType, null: false, authenticate: true,
+                                    description: 'Returns the Habit of the input Habit ID.' do
+      argument :habit_id, ID, required: true, description: "ID of the Habit."
+    end
 
     def user
       current_resource
     end
 
     def habit_index(**args)
-      Queries::HabitIndex.new(current_resource).index(args[:active], args[:days_of_week])
+      Queries::HabitIndex.new(current_resource).index(active: args[:active], frequency: args[:days_of_week])
+    end
+
+    def categories_index
+      current_resource.categories
+    end
+
+    def habit(habit_id:)
+      current_resource.habits.find(habit_id)
     end
   end
 end

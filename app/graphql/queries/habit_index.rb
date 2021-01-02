@@ -9,7 +9,7 @@ module Queries
       @user = user
     end
 
-    def index(active = nil, frequency = nil)
+    def index(active: nil, frequency: nil)
       habits = user.habits.all
 
       habits = habits.inactive if active == false
