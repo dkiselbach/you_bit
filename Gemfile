@@ -15,6 +15,8 @@ gem 'puma', '~> 5.0'
 # gem 'jbuilder', '~> 2.7'
 # Use Redis adapter to run Action Cable in production
 
+gem "nokogiri", ">= 1.11.0.rc4"
+
 # Background jobs
 gem 'redis', '~> 4.0'
 gem 'sidekiq'
