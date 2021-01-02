@@ -17,12 +17,19 @@ module Mutations
     argument :frequency, [String], required: false,
                                    description: "The Habit Frequency. This is one of: #{frequency_options}."
     argument :start_date, GraphQL::Types::ISO8601Date, required: false, description: 'The Habit Start Date.'
+    argument :category_name, String, required: false,
+                                     description: 'The Category for the Habit. This will create a new
+                                                   Category if the Category does not exist.'
 
     def resolve(habit_id:, **attrs)
       user = current_resource
       habit = user.habits.find(habit_id)
       habit.update(**attrs)
-      { habit: habit }
+
+      return { habit: habit } if habit.valid?
+
+      raise Errors::ValidationError.new("Habit couldn't be created",
+                                        errors: habit.errors.messages)
     rescue ActiveRecord::RecordNotFound
       raise Errors::UserInputError.new('Habit not found', errors: I18n.t('graphql_devise.errors.bad_id'))
     end

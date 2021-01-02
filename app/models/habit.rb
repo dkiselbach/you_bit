@@ -49,6 +49,8 @@ class Habit < ApplicationRecord
   def check_category
     return false if category_name.nil?
 
+    category_name.downcase!
+
     category = Category.find_by(name: category_name)
 
     category_id = if category.present?
