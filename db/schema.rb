@@ -10,10 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_28_233109) do
+ActiveRecord::Schema.define(version: 2020_12_31_154154) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "categories", force: :cascade do |t|
+    t.string "name", limit: 100, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_categories_on_name", unique: true
+  end
 
   create_table "habit_logs", force: :cascade do |t|
     t.bigint "habit_id", null: false
@@ -34,6 +41,9 @@ ActiveRecord::Schema.define(version: 2020_12_28_233109) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "active", default: true, null: false
+    t.bigint "category_id"
+    t.string "category_name"
+    t.index ["category_id"], name: "index_habits_on_category_id"
     t.index ["user_id"], name: "index_habits_on_user_id"
   end
 
@@ -59,5 +69,6 @@ ActiveRecord::Schema.define(version: 2020_12_28_233109) do
   end
 
   add_foreign_key "habit_logs", "habits"
+  add_foreign_key "habits", "categories"
   add_foreign_key "habits", "users"
 end

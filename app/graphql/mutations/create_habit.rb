@@ -15,6 +15,10 @@ module Mutations
     argument :frequency, [String], required: true,
                                    description: "The Habit Frequency. This is one of: #{frequency_options}."
     argument :start_date, GraphQL::Types::ISO8601Date, required: true, description: 'The Habit Start Date.'
+    argument :category_name, String, required: true,
+                                     description: 'The Category for the Habit. This will create a new
+                                                   Category if the Category does not exist.'
+
 
     def resolve(**attrs)
       habit = current_resource.habits.create(attrs)

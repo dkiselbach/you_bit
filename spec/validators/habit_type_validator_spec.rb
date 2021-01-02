@@ -10,7 +10,7 @@ module Validators
 
     describe 'invalid habit type' do
       [0, 'aspiration', ' '].each do |type|
-        describe "when habit type is #{type}" do
+        context "when habit type is #{type}" do
           it 'adds an error' do
             object.habit_type = type
             object.valid?
@@ -22,7 +22,7 @@ module Validators
 
     describe 'valid habit type' do
       %w[goal limit].each do |type|
-        describe "when habit type is #{type}" do
+        context "when habit type is #{type}" do
           it 'does not add an error' do
             object.habit_type = type
             object.valid?

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Class responsible for managing users
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :lockable, :timeoutable, and :omniauthable
@@ -8,6 +9,7 @@ class User < ApplicationRecord
   include GraphqlDevise::Concerns::Model
   after_create :send_welcome_email
   has_many :habits, dependent: :destroy
+  has_many :categories, through: :habits
 
   private
 

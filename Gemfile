@@ -50,6 +50,7 @@ group :development, :test do
   gem 'faker'
   gem 'rspec-rails'
   gem 'timecop'
+  gem 'guard-rspec', require: false
 
   # formatting
   gem 'rubocop'

@@ -10,7 +10,7 @@ module Validators
 
     describe 'invalid date' do
       [0, '12/31/2020', 'hi', ' '].each do |date|
-        describe "when date is #{date}" do
+        context "when date is #{date}" do
           it 'adds an error' do
             object.date = date
             object.valid?
@@ -22,7 +22,7 @@ module Validators
 
     describe 'valid date' do
       [Date.new, '2020/12/31'].each do |date|
-        describe "when date is #{date}" do
+        context "when date is #{date}" do
           it 'does not add an error' do
             object.date = date
             object.valid?

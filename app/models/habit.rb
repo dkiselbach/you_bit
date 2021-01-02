@@ -6,12 +6,15 @@ class Habit < ApplicationRecord
   validates :habit_type, presence: true, habit_type: true
   validates :active, inclusion: { in: [true, false] }
   validates :start_date, date: true, presence: true
+  validates :category_name, presence: true, length: { maximum: 100 }
   validate :frequency_is_valid
   belongs_to :user
+  belongs_to :category
   has_many :habit_logs, dependent: :destroy
   scope :active, -> { where(active: true) }
   scope :inactive, -> { where(active: false) }
   scope :with_certain_days, ->(certain_days) { where('frequency && ARRAY[?]', certain_days) }
+  before_validation :check_category
 
   def logged?(selected_date)
     habit_logs.where(logged_date: selected_date).exists?
@@ -42,6 +45,20 @@ class Habit < ApplicationRecord
   end
 
   private
+
+  def check_category
+    return false if category_name.nil?
+
+    category = Category.find_by(name: category_name)
+
+    category_id = if category.present?
+                    category.id
+                  else
+                    Category.create(name: category_name).id
+                  end
+
+    self.category_id = category_id
+  end
 
   def frequency_is_valid
     return unless frequency
