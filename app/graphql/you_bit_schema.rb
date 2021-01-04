@@ -26,4 +26,12 @@ class YouBitSchema < GraphQL::Schema
 
   # Add built-in connections for pagination
   use GraphQL::Pagination::Connections
+
+  # Error handling
+  use GraphQL::Execution::Errors
+
+  rescue_from(ActiveRecord::RecordNotFound) do |err, obj, args, ctx, field|
+    raise Errors::UserInputError.new(err.message,
+                                     errors: I18n.t('graphql_devise.ersperrors.bad_id'))
+  end
 end

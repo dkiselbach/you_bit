@@ -19,12 +19,6 @@ module Mutations
 
       return { habit_log: habit_log } if habit_log.valid?
 
-      raise Errors::ValidationError.new("Habit Log couldn't be created",
-                                        errors: habit_log.errors.messages)
-
-
-    rescue ActiveRecord::RecordNotFound
-      raise Errors::UserInputError.new('Habit not found', errors: I18n.t('graphql_devise.errors.bad_id'))
     end
   end
 end

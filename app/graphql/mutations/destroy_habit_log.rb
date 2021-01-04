@@ -11,9 +11,9 @@ module Mutations
     def resolve(habit_log_id:)
       habit_log = HabitLog.find(habit_log_id)
 
-      user_has_access_to_habit = current_resource.habits.find_by(id: habit_log.habit_id).present?
+      habit = Habit.find(habit_log.habit_id)
 
-      unless user_has_access_to_habit
+      unless user_has_access_to_habit(habit: habit)
         raise Errors::ForbiddenError.new('User does not have access to the Habit Log',
                                          errors: I18n.t('graphql_devise.errors.bad_id'))
       end
@@ -21,9 +21,6 @@ module Mutations
       habit_log.destroy
 
       { habit_log: habit_log }
-
-    rescue ActiveRecord::RecordNotFound
-      raise Errors::UserInputError.new('Habit Log not found', errors: I18n.t('graphql_devise.errors.bad_id'))
     end
   end
 end

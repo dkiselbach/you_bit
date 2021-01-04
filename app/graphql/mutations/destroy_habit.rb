@@ -9,13 +9,16 @@ module Mutations
     argument :habit_id, ID, required: true, description: 'The ID of the Habit.'
 
     def resolve(habit_id:)
-      user = current_resource
-      habit = user.habits.find(habit_id)
-      habit.destroy
-      { habit: habit }
+      habit = Habit.find(habit_id)
 
-    rescue ActiveRecord::RecordNotFound
-      raise Errors::UserInputError.new('Habit not found', errors: I18n.t('graphql_devise.errors.bad_id'))
+      unless user_has_access_to_habit(habit: habit)
+        raise Errors::ForbiddenError.new('User does not have access to the Habit',
+                                         errors: I18n.t('graphql_devise.errors.bad_id'))
+      end
+
+      habit.destroy
+
+      { habit: habit }
     end
   end
 end

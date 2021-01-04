@@ -22,16 +22,19 @@ module Mutations
                                                    Category if the Category does not exist.'
 
     def resolve(habit_id:, **attrs)
-      user = current_resource
-      habit = user.habits.find(habit_id)
+      habit = Habit.find(habit_id)
+
+      unless user_has_access_to_habit(habit: habit)
+        raise Errors::ForbiddenError.new('User does not have access to the Habit',
+                                         errors: I18n.t('graphql_devise.errors.bad_id'))
+      end
+
       habit.update(**attrs)
 
       return { habit: habit } if habit.valid?
 
-      raise Errors::ValidationError.new("Habit couldn't be created",
+      raise Errors::ValidationError.new("Habit couldn't be updated",
                                         errors: habit.errors.messages)
-    rescue ActiveRecord::RecordNotFound
-      raise Errors::UserInputError.new('Habit not found', errors: I18n.t('graphql_devise.errors.bad_id'))
     end
   end
 end
