@@ -9,12 +9,7 @@ module Mutations
     argument :habit_id, ID, required: true, description: 'The ID of the Habit.'
 
     def resolve(habit_id:)
-      habit = Habit.find(habit_id)
-
-      unless user_has_access_to_habit(habit: habit)
-        raise Errors::ForbiddenError.new('User does not have access to the Habit',
-                                         errors: I18n.t('graphql_devise.errors.bad_id'))
-      end
+      habit = find_habit_in_user_context(habit_id: habit_id)
 
       habit.destroy
 

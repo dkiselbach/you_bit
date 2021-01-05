@@ -32,6 +32,6 @@ class YouBitSchema < GraphQL::Schema
 
   rescue_from(ActiveRecord::RecordNotFound) do |err, obj, args, ctx, field|
     raise Errors::UserInputError.new(err.message,
-                                     errors: I18n.t('graphql_devise.ersperrors.bad_id'))
+                                     errors: I18n.t('graphql_devise.errors.bad_id'))
   end
 end

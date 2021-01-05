@@ -4,6 +4,7 @@ module Types
   # Class representing all queries within the Youbit app
   class QueryType < Types::BaseObject
     include GraphqlDevise::Concerns::ControllerMethods
+    include ::GraphQlMixins::HabitHelpers
     field :user, UserType, null: false, authenticate: true, description: 'Returns the currently signed in user.'
     field :habit_index, [Types::HabitType], null: false, authenticate: true,
                                             description: 'Returns the Habits of the signed in User.' do
@@ -32,7 +33,7 @@ module Types
     end
 
     def habit(habit_id:)
-      current_resource.habits.find(habit_id)
+      find_habit_in_user_context(habit_id: habit_id)
     end
   end
 end

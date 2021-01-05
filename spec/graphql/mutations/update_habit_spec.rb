@@ -5,16 +5,12 @@ require 'rails_helper'
 module Mutations
   RSpec.describe UpdateHabit, type: :request do
     describe '.resolve' do
-      subject(:error_code) { JSON.parse(response.body).dig('errors', 0, 'extensions', 'code') }
+      include_context 'shared methods'
 
-      let(:user) { create_user_with_habits }
       let(:args) do
         { name: 'Run every day', description: 'Run everyday in the evening',
           type: 'goal', frequency: 'daily', start_date: Date.new }
       end
-      let(:auth_headers) { user.create_new_auth_token }
-      let(:forbidden_user) { create(:user) }
-      let(:forbidden_auth_headers) { forbidden_user.create_new_auth_token }
 
       context 'with valid habit ID' do
         it 'returns updated habit' do

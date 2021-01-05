@@ -5,14 +5,13 @@ require 'rails_helper'
 module Mutations
   RSpec.describe CreateHabit, type: :request do
     describe '.resolve' do
-      let!(:user) { create_user_with_habits }
+      include_context 'shared methods'
       let(:args) do
         { name: 'Run every day', description: 'Run everyday in the evening',
           type: 'goal', frequency: ['daily'], start_date: Date.new,
-          category_name: "We like sports!"
+          category_name: 'We like sports!'
         }
       end
-      let(:auth_headers) { user.create_new_auth_token }
 
       it 'creates a habit' do
         post '/graphql', params: { query: create_habit_mutation(**args) }, headers: auth_headers
@@ -21,6 +20,7 @@ module Mutations
       end
 
       it 'creates a category if no category found' do
+        habits
         expect do
           post '/graphql', params: { query: create_habit_mutation(**args) },
                            headers: auth_headers
@@ -38,13 +38,11 @@ module Mutations
       it 'with invalid params returns error' do
         args[:type] = 'goals'
         post '/graphql', params: { query: create_habit_mutation(**args) }, headers: auth_headers
-        error_message = JSON.parse(response.body).dig('errors', 0, 'extensions', 'detailed_errors', 'habit_type', 0)
-        expect(error_message).to eq("Must be either 'goal' or 'limit'")
+        expect(error_code).to eq('VALIDATION_ERROR')
       end
 
       it 'with no auth returns error' do
         post '/graphql', params: { query: create_habit_mutation(**args) }
-        error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
         expect(error_code).to eq('AUTHENTICATION_ERROR')
       end
     end

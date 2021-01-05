@@ -5,12 +5,10 @@ require 'rails_helper'
 module Queries
   RSpec.describe HabitIndex do
     describe '.index' do
-      let(:user) { create_user_with_habits }
+      include_context 'shared methods'
       let(:args) do
         { frequency: ['daily'], active: true }
       end
-
-      let(:habits) { create_habit_with_logs(5, user.habits.first) }
 
       context 'when no params input' do
         it { expect(described_class.new(user).index.size).to eq(5) }

@@ -5,8 +5,7 @@ require 'rails_helper'
 module Mutations
   RSpec.describe DestroyHabit, type: :request do
     describe '.resolve' do
-      let(:user) { create_user_with_habits }
-      let(:auth_headers) { user.create_new_auth_token }
+      include_context 'shared methods'
 
       it 'returns destroyed habit' do
         habit = user.habits.first
@@ -24,14 +23,12 @@ module Mutations
       it 'with incorrect ID UserInputError is thrown' do
         habit_id = user.habits.last.id + 1
         post '/graphql', params: { query: destroy_habit_mutation(habit_id) }, headers: auth_headers
-        error_message = JSON.parse(response.body).dig('errors', 0, 'extensions', 'detailed_errors', 'id', 0)
-        expect(error_message).to eq('is invalid')
+        expect(error_code).to eq('USER_INPUT_ERROR')
       end
 
       it 'with no auth returns error' do
         habit_id = user.habits.last.id
         post '/graphql', params: { query: destroy_habit_mutation(habit_id) }
-        error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
         expect(error_code).to eq('AUTHENTICATION_ERROR')
       end
     end

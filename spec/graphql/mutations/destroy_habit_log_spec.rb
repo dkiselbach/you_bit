@@ -5,12 +5,7 @@ require 'rails_helper'
 module Mutations
   RSpec.describe DestroyHabitLog, type: :request do
     describe '.resolve' do
-      let(:user) { create_user_with_habits }
-      let(:forbidden_user) { create(:user) }
-      let(:auth_headers) { user.create_new_auth_token }
-      let(:forbidden_auth_headers) { forbidden_user.create_new_auth_token }
-
-      let(:habits) { create_habit_with_logs(5, user.habits.first) }
+      include_context 'shared methods'
 
       context 'with valid habit ID' do
         it 'returns destroyed habit log' do

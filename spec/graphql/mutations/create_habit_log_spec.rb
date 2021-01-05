@@ -5,11 +5,10 @@ require 'rails_helper'
 module Mutations
   RSpec.describe CreateHabitLog, type: :request do
     describe '.resolve' do
-      let!(:user) { create_user_with_habits }
+      include_context 'shared methods'
       let(:args) do
-        { habit_id: Habit.first.id, logged_date: Date.new, habit_type: "goal" }
+        { habit_id: user.habits.first.id, logged_date: Date.new, habit_type: "goal" }
       end
-      let(:auth_headers) { user.create_new_auth_token }
 
       describe 'creates a habit log' do
         it 'returns habitLog payload' do
@@ -29,21 +28,26 @@ module Mutations
       it 'with invalid params returns error' do
         args[:habit_type] = 'aspiration'
         post '/graphql', params: { query: create_habit_log_mutation(**args) }, headers: auth_headers
-        error_message = JSON.parse(response.body).dig('errors', 0, 'extensions', 'detailed_errors', 'habit_type', 0)
-        expect(error_message).to eq("Must be either 'goal' or 'limit'")
+        expect(error_code).to eq("VALIDATION_ERROR")
       end
 
       it 'with invalid id returns error' do
         args[:habit_id] = Habit.last.id + 100
         post '/graphql', params: { query: create_habit_log_mutation(**args) }, headers: auth_headers
-        error_message = JSON.parse(response.body).dig('errors', 0, 'message')
-        expect(error_message).to eq('Habit not found')
+        expect(error_code).to eq('USER_INPUT_ERROR')
       end
 
       it 'with no auth returns error' do
         post '/graphql', params: { query: create_habit_log_mutation(**args) }
-        error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
         expect(error_code).to eq('AUTHENTICATION_ERROR')
+      end
+
+      context 'with user without access to habit' do
+        it 'ForbiddenError is raised' do
+          post '/graphql', params: { query: create_habit_log_mutation(**args) },
+               headers: forbidden_auth_headers
+          expect(error_code).to eq('FORBIDDEN_ERROR')
+        end
       end
     end
   end

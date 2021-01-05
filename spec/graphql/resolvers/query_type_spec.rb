@@ -4,8 +4,7 @@ require 'rails_helper'
 
 module Types
   RSpec.describe QueryType, type: :request do
-    let!(:user) { create_user_with_habits }
-    let(:auth_headers) { user.create_new_auth_token }
+    include_context 'shared methods'
 
     describe '.habit_index' do
       let(:args) do
@@ -107,14 +106,14 @@ module Types
 
       context 'with invalid ID' do
         it 'UserInputError is raised' do
-          post '/graphql', params: { query: update_habit_mutation(user.habits.last.id + 100, **args) }, headers: auth_headers
+          post '/graphql', params: { query: habit_query(habit_id: user.habits.last.id + 100) }, headers: auth_headers
           expect(error_code).to eq('USER_INPUT_ERROR')
         end
       end
 
       context 'with user without access to habit' do
         it 'ForbiddenError is raised' do
-          post '/graphql', params: { query: update_habit_mutation(user.habits.last.id, **args) },
+          post '/graphql', params: { query: habit_query(habit_id: user.habits.last.id) },
                headers: forbidden_auth_headers
           expect(error_code).to eq('FORBIDDEN_ERROR')
         end
