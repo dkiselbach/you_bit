@@ -29,7 +29,7 @@ module Types
     end
 
     def categories_index
-      current_resource.categories
+      current_resource.categories.uniq
     end
 
     def habit(habit_id:)

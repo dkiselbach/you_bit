@@ -1,8 +1,6 @@
 module GraphQlMixins
   # Helper methods for habits within graphql
   module HabitHelpers
-    extend ActiveSupport::Concern
-
     private
 
     def find_habit_in_user_context(habit_id:)
