@@ -10,10 +10,11 @@ class User < ApplicationRecord
   after_create :send_welcome_email
   has_many :habits, dependent: :destroy
   has_many :categories, through: :habits
+  has_many :devices, dependent: :destroy
 
   private
 
   def send_welcome_email
-    email = UserMailer.with(user: self).welcome_email.deliver_later
+    UserMailer.with(user: self).welcome_email.deliver_later
   end
 end

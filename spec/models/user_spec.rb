@@ -4,7 +4,7 @@ require 'rails_helper'
 
 module Models
   RSpec.describe User, type: :model do
-    let(:user) { create_user_with_habits }
+    include_context 'shared methods'
 
     describe '.create' do
       context 'when created' do
@@ -33,6 +33,13 @@ module Models
         it 'destroys habit logs' do
           create_habit_with_logs(5, user.habits.first)
           expect { destroy_user }.to change(HabitLog, :count).by(-5)
+        end
+      end
+
+      context 'when has devices' do
+        it 'destroys devices' do
+          create(:device, user: user)
+          expect { destroy_user }.to change(Device, :count).by(-1)
         end
       end
     end

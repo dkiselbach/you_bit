@@ -9,7 +9,7 @@ module Mutations
     argument :habit_id, ID, required: true, description: 'The ID of the Habit.'
 
     def resolve(habit_id:)
-      habit = find_habit_in_user_context(habit_id: habit_id)
+      habit = find_object_in_user_context(object_id: habit_id, klass: Habit)
 
       habit.destroy
 

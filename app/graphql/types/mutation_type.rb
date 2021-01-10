@@ -8,5 +8,7 @@ module Types
     field :update_habit, mutation: Mutations::UpdateHabit, authenticate: true
     field :create_habit_log, mutation: Mutations::CreateHabitLog, authenticate: true
     field :destroy_habit_log, mutation: Mutations::DestroyHabitLog, authenticate: true
+    field :create_device, mutation: Mutations::CreateDevice, authenticate: true
+    field :destroy_device, mutation: Mutations::DestroyDevice, authenticate: true
   end
 end

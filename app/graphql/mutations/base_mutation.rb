@@ -4,7 +4,7 @@ module Mutations
   class BaseMutation < GraphQL::Schema::Mutation
     include GraphqlDevise::Concerns::ControllerMethods
     include ActiveSupport::Concern
-    include ::GraphQlMixins::HabitHelpers
+    include ::GraphQlMixins::HelperMethods
     argument_class Types::BaseArgument
     field_class Types::BaseField
     object_class Types::BaseObject

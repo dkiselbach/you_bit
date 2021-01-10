@@ -11,7 +11,7 @@ module Mutations
     def resolve(habit_log_id:)
       habit_log = HabitLog.find(habit_log_id)
 
-      find_habit_in_user_context(habit_id: habit_log.habit_id)
+      find_object_in_user_context(object_id: habit_log.habit_id, klass: Habit)
 
       habit_log.destroy
 

@@ -22,7 +22,7 @@ module Mutations
                                                    Category if the Category does not exist.'
 
     def resolve(habit_id:, **attrs)
-      habit = find_habit_in_user_context(habit_id: habit_id)
+      habit = find_object_in_user_context(object_id: habit_id, klass: Habit)
 
       habit.update(**attrs)
 
