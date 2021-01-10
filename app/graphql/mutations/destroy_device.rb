@@ -6,7 +6,7 @@ module Mutations
     description 'Deletes a Device for a user.'
 
     field :device, Types::DeviceType, null: false, description: 'The information for the Device you deleted.'
-    argument :token, ID, required: true, description: 'The Token of the Device.'
+    argument :token, String, required: true, description: 'The Token of the Device.'
 
     def resolve(token:)
       device = Device.find_by(token: token)

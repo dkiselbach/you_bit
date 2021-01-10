@@ -11,5 +11,6 @@ module Types
     field :create_device, mutation: Mutations::CreateDevice, authenticate: true
     field :destroy_device, mutation: Mutations::DestroyDevice, authenticate: true
     field :create_reminder, mutation: Mutations::CreateReminder, authenticate: true
+    field :destroy_reminder, mutation: Mutations::DestroyReminder, authenticate: true
   end
 end

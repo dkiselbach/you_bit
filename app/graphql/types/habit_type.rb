@@ -16,6 +16,7 @@ module Types
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false,
                                                         description: 'The DateTime value of when the Habit was updated.'
     field :habit_logs, [Types::HabitLogType], null: true, description: 'Logs for the Habit.'
+    field :reminders, [Types::ReminderType], null: true, description: 'Reminders for the Habit.'
     field :is_logged, Types::IsLoggedType, null: false, description: 'If the Habit has been Logged.' do
       argument :selected_date, GraphQL::Types::ISO8601Date, required: true
     end
@@ -26,6 +27,10 @@ module Types
 
     def habit_logs
       @object.habit_logs.order('logged_date DESC')
+    end
+
+    def reminders
+      @object.reminders
     end
 
     def is_logged(selected_date:)

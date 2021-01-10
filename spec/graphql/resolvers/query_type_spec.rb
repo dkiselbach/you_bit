@@ -10,6 +10,7 @@ module Types
       let(:args) do
         { frequency: ['daily'], active: true, selected_date: '2020-12-29' }
       end
+      let(:reminders) { create(:reminder, habit: user.habits.first) }
 
       let!(:habit_logs) do
         %w[2020-12-29 2020-12-30 2020-12-31 2021-01-01 2021-01-02].each do |date|
@@ -30,6 +31,15 @@ module Types
           post '/graphql', params: { query: habits_index_query(**args) }, headers: auth_headers
           habit_logs = JSON.parse(response.body).dig('data', 'habitIndex', 0, 'habitLogs')
           expect(habit_logs.length).to eq(5)
+        end
+      end
+
+      context 'when habit has reminders' do
+        it 'returns habit reminders' do
+          reminders
+          post '/graphql', params: { query: habits_index_query(**args) }, headers: auth_headers
+          reminders = JSON.parse(response.body).dig('data', 'habitIndex', 0, 'reminders')
+          expect(reminders.length).to eq(1)
         end
       end
 
@@ -183,6 +193,10 @@ def habits_index_query(**args)
         habitLogs {
           id
           loggedDate
+        }
+        reminders {
+          id
+          remindAt
         }
       }
     }
