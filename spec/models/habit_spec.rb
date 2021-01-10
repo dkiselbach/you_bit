@@ -107,6 +107,13 @@ RSpec.describe Habit, type: :model do
         expect { described_class.first.destroy }.to change(HabitLog, :count).by(-5)
       end
     end
+
+    context 'when has reminders' do
+      it 'deletes associated reminders' do
+        create(:reminder, habit: user.habits.first)
+        expect { described_class.first.destroy }.to change(Reminder, :count).by(-1)
+      end
+    end
   end
 
   describe '.logged?' do

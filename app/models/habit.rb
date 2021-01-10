@@ -11,6 +11,7 @@ class Habit < ApplicationRecord
   belongs_to :user
   belongs_to :category
   has_many :habit_logs, dependent: :destroy
+  has_many :reminders, dependent: :destroy
   scope :active, -> { where(active: true) }
   scope :inactive, -> { where(active: false) }
   scope :with_certain_days, ->(certain_days) { where('frequency && ARRAY[?]', certain_days) }

@@ -10,5 +10,6 @@ module Types
     field :destroy_habit_log, mutation: Mutations::DestroyHabitLog, authenticate: true
     field :create_device, mutation: Mutations::CreateDevice, authenticate: true
     field :destroy_device, mutation: Mutations::DestroyDevice, authenticate: true
+    field :create_reminder, mutation: Mutations::CreateReminder, authenticate: true
   end
 end
