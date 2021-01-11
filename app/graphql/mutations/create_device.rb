@@ -16,6 +16,10 @@ This will be used when sending push notifications to the user device.'
                                          description: 'The name of the device.'
 
     def resolve(**attrs)
+      existing_device = current_resource.devices.find_by(token: attrs[:token])
+
+      return { device: existing_device } unless existing_device.nil?
+
       device = current_resource.devices.create(attrs)
 
       return { device: device } if device.valid?

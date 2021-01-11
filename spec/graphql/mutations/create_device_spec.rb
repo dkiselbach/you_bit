@@ -33,6 +33,25 @@ module Mutations
         end
       end
 
+      context 'when token already exists for user' do
+        let(:device) { create(:device, token: 'Existing Token', user: user) }
+
+        before do
+          args[:token] = 'Existing Token'
+          device
+        end
+
+        it 'does not create device' do
+          expect { create_device_request }.to change(Device, :count).by(0)
+        end
+
+        it 'returns existing device payload' do
+          create_device_request
+          device_id = JSON.parse(response.body).dig('data', 'createDevice', 'device', 'id')
+          expect(device_id.to_i).to eq(device.id)
+        end
+      end
+
       context 'without platform' do
         it 'ValidationError is raised' do
           args[:platform] = nil
