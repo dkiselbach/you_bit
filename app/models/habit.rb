@@ -16,6 +16,7 @@ class Habit < ApplicationRecord
   scope :inactive, -> { where(active: false) }
   scope :with_certain_days, ->(certain_days) { where('frequency && ARRAY[?]', certain_days) }
   before_validation :check_category
+  before_update :destroy_legacy_reminders
 
   def logged?(selected_date:)
     habit_logs.where(logged_date: selected_date).exists?
@@ -23,10 +24,7 @@ class Habit < ApplicationRecord
 
   def logged(selected_date:)
     habit_log = habit_logs.find_by(logged_date: selected_date)
-    {
-      habit_log: habit_log,
-      logged: habit_log.present?
-    }
+    { habit_log: habit_log, logged: habit_log.present? }
   end
 
   def longest_streak
@@ -71,6 +69,12 @@ class Habit < ApplicationRecord
     return unless !frequency.is_a?(Array) || frequency.any? { |option| valid_options.exclude?(option) }
 
     errors.add(:frequency, "Must be one of: #{valid_options}")
+  end
+
+  def destroy_legacy_reminders
+    return unless frequency_changed?
+
+    reminders.destroy_all
   end
 
   LONGEST_STREAK_QUERY = <<-SQL

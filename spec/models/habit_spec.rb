@@ -192,4 +192,14 @@ RSpec.describe Habit, type: :model do
       it { expect(create_habit.active).to be_truthy }
     end
   end
+  
+  describe '.update frequency' do
+    context 'when has reminders' do
+      it 'deletes associated reminders' do
+        create(:reminder, habit: user.habits.first)
+        expect { described_class.first.update(frequency: ['monday']) }.to change(Reminder, :count).by(-1)
+
+      end
+    end
+  end
 end

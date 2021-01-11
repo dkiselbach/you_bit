@@ -15,7 +15,7 @@ gem 'puma', '~> 5.0'
 # gem 'jbuilder', '~> 2.7'
 # Use Redis adapter to run Action Cable in production
 
-gem "nokogiri", ">= 1.11.0.rc4"
+gem 'nokogiri', '>= 1.11.0.rc4'
 
 # Background jobs
 gem 'redis', '~> 4.0'
@@ -40,6 +40,9 @@ gem 'devise'
 gem 'devise_token_auth', github: 'lynndylanhurley/devise_token_auth'
 gem 'graphql_devise'
 
+# Push Notifications
+gem 'exponent-server-sdk'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
@@ -50,16 +53,16 @@ group :development, :test do
   # test
   gem 'factory_bot_rails'
   gem 'faker'
+  gem 'guard-rspec', require: false
   gem 'rspec-rails'
   gem 'timecop'
-  gem 'guard-rspec', require: false
 
   # formatting
+  gem 'parser', '>= 3.0.0'
   gem 'rubocop'
   gem 'rubocop-performance'
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
-  gem 'solargraph'
 end
 
 group :development do
