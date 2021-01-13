@@ -7,7 +7,7 @@ module Mutations
     describe '.resolve' do
       include_context 'shared methods'
       let(:args) do
-        { habit_id: user.habits.first.id, remind_at: (DateTime.current + 2.hours).to_s }
+        { habit_id: user.habits.first.id, remind_at: (DateTime.current + 2.hours).to_s, time_zone: 'America/New_York' }
       end
       let(:create_reminder_request) do
         post '/graphql', params: { query: create_reminder_mutation(**args) }, headers: auth_headers
@@ -48,6 +48,22 @@ module Mutations
         end
       end
 
+      context 'without time_zone' do
+        it 'ValidationError is raised' do
+          args[:time_zone] = nil
+          create_reminder_request
+          expect(error_code).to eq('VALIDATION_ERROR')
+        end
+      end
+
+      context 'with incorrect time_zone' do
+        it 'ValidationError is raised' do
+          args[:time_zone] = 'A far away land'
+          create_reminder_request
+          expect(error_code).to eq('VALIDATION_ERROR')
+        end
+      end
+
       context 'with no auth' do
         it 'AuthenticationError is raised' do
           post '/graphql', params: { query: create_reminder_mutation(**args) }
@@ -61,7 +77,8 @@ end
 def create_reminder_mutation(**args)
   <<~GQL
     mutation {
-    createReminder(habitId: "#{args[:habit_id]}", remindAt: "#{args[:remind_at]}") {
+    createReminder(habitId: "#{args[:habit_id]}", remindAt: "#{args[:remind_at]}",
+                   timeZone: "#{args[:time_zone]}") {
         reminder {
           id
           remindAt

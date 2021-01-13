@@ -3,6 +3,7 @@
 # A class for the Reminder model.
 class Reminder < ApplicationRecord
   validates :remind_at, date: true, presence: true
+  validates :time_zone, time_zone: true, presence: true
   belongs_to :habit
   after_save :enqueue_reminders
 

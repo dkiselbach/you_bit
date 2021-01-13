@@ -127,4 +127,71 @@ class Habit < ApplicationRecord
                 ORDER BY end_date DESC
                 LIMIT 1;
   SQL
+
+  LONGEST_LIMIT_STREAK_QUERY = <<-SQL
+                  WITH distinct_dates AS (
+                    SELECT
+                      '2020-10-01'::DATE as logged_date
+                    UNION All
+                    SELECT DISTINCT
+                      logged_date
+                    FROM habit_logs
+                    WHERE habit_id = 4
+                    ORDER BY logged_date DESC
+                  ),
+                  groups AS (
+                  SELECT
+                    ROW_NUMBER() OVER (ORDER BY logged_date) AS rank_number,
+                    (logged_date - INTERVAL '1 day' *  ROW_NUMBER() OVER (ORDER BY logged_date)) AS grp,
+                    logged_date
+                  FROM distinct_dates
+                )
+                SELECT
+                  COUNT(*) AS habit_streak,
+                  MIN(logged_date) AS start_date,
+                  MAX(logged_date) AS end_date,
+                  CASE 
+                    WHEN logged_date - lag(logged_date) over (ORDER BY logged_date) IS NOT NULL THEN logged_date - lag(logged_date) over (ORDER BY logged_date)
+                    ELSE 0
+                  END AS limit_streak
+                FROM groups
+                GROUP BY grp, logged_date
+                ORDER BY limit_streak DESC, start_date DESC
+                LIMIT 1;
+  SQL
+
+  CURRENT_LIMIT_STREAK_QUERY = <<-SQL
+                  WITH distinct_dates AS (
+                    SELECT
+                      '2020-10-01'::DATE as logged_date
+                    UNION ALL
+                    SELECT
+                      '2021-01-12'::DATE as logged_date
+                    UNION ALL
+                    SELECT DISTINCT
+                      logged_date
+                    FROM habit_logs
+                    WHERE habit_id = 4
+                    ORDER BY logged_date DESC
+                  ),
+                  groups AS (
+                  SELECT
+                    ROW_NUMBER() OVER (ORDER BY logged_date) AS rank_number,
+                    (logged_date - INTERVAL '1 day' *  ROW_NUMBER() OVER (ORDER BY logged_date)) AS grp,
+                    logged_date
+                  FROM distinct_dates
+                )
+                SELECT
+                  COUNT(*) AS habit_streak,
+                  MIN(logged_date) AS start_date,
+                  MAX(logged_date) AS end_date,
+                  CASE 
+                    WHEN logged_date - lag(logged_date) over (ORDER BY logged_date) IS NOT NULL THEN logged_date - lag(logged_date) over (ORDER BY logged_date)
+                    ELSE 0
+                  END AS limit_streak
+                FROM groups
+                GROUP BY grp, logged_date
+                ORDER BY start_date DESC
+                LIMIT 1;
+  SQL
 end
