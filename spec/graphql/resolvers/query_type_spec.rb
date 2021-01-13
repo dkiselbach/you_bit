@@ -163,6 +163,32 @@ module Types
         end
       end
     end
+
+    describe '.remindersIndex' do
+      let!(:reminders) { create_list(:reminder, 5, habit: user.habits.first) }
+
+      context 'when user has reminders' do
+        it 'returns reminder id' do
+          post '/graphql', params: { query: reminders_index_query }, headers: auth_headers
+          id = JSON.parse(response.body).dig('data', 'remindersIndex', 0, 'id')
+          expect(id.to_i).to eq(reminders.first.id)
+        end
+
+        it 'returns associated habit id' do
+          post '/graphql', params: { query: reminders_index_query }, headers: auth_headers
+          habit_name = JSON.parse(response.body).dig('data', 'remindersIndex', 0, 'habit', 'name')
+          expect(habit_name).to eq(user.habits.first.name)
+        end
+      end
+
+      context 'when not logged in' do
+        it 'returns authorization error' do
+          post '/graphql', params: { query: reminders_index_query }
+          error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
+          expect(error_code).to eq('AUTHENTICATION_ERROR')
+        end
+      end
+    end
   end
 end
 
@@ -232,6 +258,20 @@ def categories_index_query
       categoriesIndex {
         id
         name
+      }
+    }
+  GQL
+end
+
+def reminders_index_query
+  <<~GQL
+    query {
+      remindersIndex {
+        id
+        remindAt
+        habit {
+          name
+        }
       }
     }
   GQL

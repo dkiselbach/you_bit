@@ -15,6 +15,8 @@ module Types
     end
     field :categories_index, [Types::CategoryType], null: false, authenticate: true,
                                                     description: 'Returns the Categories of the signed in User.'
+    field :reminders_index, [Types::ReminderType], null: false, authenticate: true,
+                                                   description: 'Returns the Reminders of the signed in User.'
     field :habit, Types::HabitType, null: false, authenticate: true,
                                     description: 'Returns the Habit of the input Habit ID.' do
       argument :habit_id, ID, required: true, description: "ID of the Habit."
@@ -30,6 +32,10 @@ module Types
 
     def categories_index
       current_resource.categories.uniq
+    end
+
+    def reminders_index
+      current_resource.reminders.uniq
     end
 
     def habit(habit_id:)

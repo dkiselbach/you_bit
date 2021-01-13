@@ -10,6 +10,7 @@ class User < ApplicationRecord
   after_create :send_welcome_email
   has_many :habits, dependent: :destroy
   has_many :categories, through: :habits
+  has_many :reminders, through: :habits
   has_many :devices, dependent: :destroy
 
   private
