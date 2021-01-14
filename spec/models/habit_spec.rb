@@ -4,6 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Habit, type: :model do
   let(:user) { create_user_with_habits(habits_count: 1) }
+  let(:limit_habit) { create(:habit, habit_type: 'limit', start_date: '2020-10-01', user: user) }
+  let(:goal_habit) { create(:habit) }
 
   let(:generate_habit_log_dates) do
     %w[2020-12-29 2020-12-30 2020-12-31 2021-01-01 2021-01-02].each do |date|
@@ -136,6 +138,26 @@ RSpec.describe Habit, type: :model do
     end
   end
 
+  describe '.limit?' do
+    context 'when habit is limit' do
+      it { expect(limit_habit.limit?).to be_truthy }
+    end
+
+    context 'when habit is goal' do
+      it { expect(goal_habit.limit?).to be_falsey }
+    end
+  end
+
+  describe '.goal?' do
+    context 'when habit is goal' do
+      it { expect(goal_habit.goal?).to be_truthy }
+    end
+
+    context 'when habit is limit' do
+      it { expect(limit_habit.goal?).to be_falsey }
+    end
+  end
+
   describe '.logged' do
     context 'when habit is logged' do
       it 'returns hash' do
@@ -165,10 +187,18 @@ RSpec.describe Habit, type: :model do
   end
 
   describe '.longest_streak' do
-    it 'returns correct streak' do
-      generate_habit_log_dates
-      habit_streak = user.habits.first.longest_streak['habit_streak']
-      expect(habit_streak).to eq(5)
+    context 'when habit is goal' do
+      it 'returns correct streak' do
+        generate_habit_log_dates
+        habit_streak = user.habits.first.longest_streak['habit_streak']
+        expect(habit_streak).to eq(5)
+      end
+    end
+
+    context 'when habit is limit' do
+      it 'returns correct streak' do
+        expect(limit_habit.longest_streak['habit_streak']).to eq((Date.today - limit_habit.start_date).to_i)
+      end
     end
   end
 
@@ -192,7 +222,7 @@ RSpec.describe Habit, type: :model do
       it { expect(create_habit.active).to be_truthy }
     end
   end
-  
+
   describe '.update frequency' do
     context 'when has reminders' do
       it 'deletes associated reminders' do

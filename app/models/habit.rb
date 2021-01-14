@@ -28,19 +28,25 @@ class Habit < ApplicationRecord
   end
 
   def longest_streak
-    LONGEST_STREAK_QUERY
+    sql = ActiveRecord::Base.sanitize_sql_array([LONGEST_STREAK_QUERY, id]) if goal?
 
-    sql = ActiveRecord::Base.sanitize_sql_array([LONGEST_STREAK_QUERY, id])
+    sql = ActiveRecord::Base.sanitize_sql_array([LONGEST_LIMIT_STREAK_QUERY, start_date, Date.current, id]) if limit?
 
     ActiveRecord::Base.connection.execute(sql).first
   end
 
   def current_streak(selected_date:)
-    CURRENT_STREAK_QUERY
-
     sql = ActiveRecord::Base.sanitize_sql_array([CURRENT_STREAK_QUERY, id, selected_date, selected_date])
 
     ActiveRecord::Base.connection.execute(sql).first
+  end
+
+  def limit?
+    habit_type == 'limit'
+  end
+
+  def goal?
+    habit_type == 'goal'
   end
 
   private
@@ -79,7 +85,7 @@ class Habit < ApplicationRecord
 
   LONGEST_STREAK_QUERY = <<-SQL
                   WITH distinct_dates AS (
-                    SELECT DISTINCT 
+                    SELECT DISTINCT
                       logged_date
                     FROM habit_logs
                     WHERE habit_id = '?'
@@ -131,12 +137,15 @@ class Habit < ApplicationRecord
   LONGEST_LIMIT_STREAK_QUERY = <<-SQL
                   WITH distinct_dates AS (
                     SELECT
-                      '2020-10-01'::DATE as logged_date
-                    UNION All
+                      ?::DATE as logged_date
+                    UNION ALL
+                    SELECT
+                      ?::DATE as logged_date
+                    UNION ALL
                     SELECT DISTINCT
                       logged_date
                     FROM habit_logs
-                    WHERE habit_id = 4
+                    WHERE habit_id = '?'
                     ORDER BY logged_date DESC
                   ),
                   groups AS (
@@ -147,16 +156,15 @@ class Habit < ApplicationRecord
                   FROM distinct_dates
                 )
                 SELECT
-                  COUNT(*) AS habit_streak,
                   MIN(logged_date) AS start_date,
                   MAX(logged_date) AS end_date,
-                  CASE 
+                  CASE
                     WHEN logged_date - lag(logged_date) over (ORDER BY logged_date) IS NOT NULL THEN logged_date - lag(logged_date) over (ORDER BY logged_date)
                     ELSE 0
-                  END AS limit_streak
+                  END AS habit_streak
                 FROM groups
                 GROUP BY grp, logged_date
-                ORDER BY limit_streak DESC, start_date DESC
+                ORDER BY habit_streak DESC, start_date DESC
                 LIMIT 1;
   SQL
 
