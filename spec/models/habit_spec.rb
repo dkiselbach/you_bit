@@ -197,7 +197,7 @@ RSpec.describe Habit, type: :model do
 
     context 'when habit is limit' do
       it 'returns correct streak' do
-        expect(limit_habit.longest_streak['habit_streak']).to eq((Date.today - limit_habit.start_date).to_i)
+        expect(limit_habit.longest_streak['habit_streak']).to eq((Date.current - limit_habit.start_date).to_i)
       end
     end
   end

@@ -5,7 +5,7 @@ class Reminder < ApplicationRecord
   validates :remind_at, date: true, presence: true
   validates :time_zone, time_zone: true, presence: true
   belongs_to :habit
-  # after_save :enqueue_reminders
+  after_save :enqueue_reminders
 
   def enqueue_reminders
     return unless habit.active
