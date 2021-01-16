@@ -40,7 +40,6 @@ RSpec.describe PushNotification do
 
   describe '.send' do
     let(:message) { [{ to: push.token, sound: push.sound, body: push.body, title: push.title }] }
-    let(:errors) { JSON.parse(push.handler.response.response_body).dig('data', 0, 'details', 'error') }
 
     before do
       allow(push.client).to receive(:send_messages).with(message) { handler }
@@ -50,7 +49,7 @@ RSpec.describe PushNotification do
       let(:handler) do
         Handler.new(code: 200,
                     response_body: success_body.to_json,
-                    receipt_ids: [success_receipt])
+                    receipt_ids: [receipt])
       end
 
       it { expect { push.client }.not_to raise_error }
@@ -80,44 +79,47 @@ RSpec.describe PushNotification do
   end
 
   describe '.verify_delivery' do
-    let(:errors) { JSON.parse(push.handler.response.response_body).dig('data', 0, 'details', 'error') }
-    let(:receipt_id) { [success_receipt] }
+    let(:handler) do
+      Handler.new(code: 200,
+                  response_body: success_body.to_json,
+                  receipt_ids: [receipt])
+    end
 
     before do
-      allow(push.handler).to receive(:receipt_ids).with(success_receipt)
-      allow(push.client).to receive(:verify_deliveries).with(message) { handler }
+      push.handler = handler
+      allow(push.client).to receive(:verify_deliveries).with([receipt]) { verify_response }
     end
 
     context 'when token is valid' do
-      let(:handler) do
+      let(:verify_response) do
         Handler.new(code: 200,
                     response_body: receipt_success_body.to_json,
-                    receipt_ids: [success_receipt])
+                    receipt_ids: [receipt])
       end
 
       it { expect { push.verify_delivery }.not_to raise_error }
     end
 
     context 'when token is invalid' do
-      let(:handler) do
+      let(:verify_response) do
         Handler.new(code: 200,
-                    response_body: not_registered_device_error_body.to_json,
-                    receipt_ids: [],
+                    response_body: receipt_error_body.to_json,
+                    receipt_ids: [receipt],
                     error: true)
       end
 
-      it { expect { push.send }.to raise_error(DeviceNotRegistered) }
+      it { expect { push.verify_delivery }.to raise_error(DeviceNotRegistered) }
     end
 
     context 'when another error is returned' do
-      let(:handler) do
+      let(:verify_response) do
         Handler.new(code: 200,
-                    response_body: invalid_credentials_error_body.to_json,
-                    receipt_ids: [],
+                    response_body: receipt_another_error_body.to_json,
+                    receipt_ids: [receipt],
                     error: true)
       end
 
-      it { expect { push.send }.to raise_error(StandardError) }
+      it { expect { push.verify_delivery }.to raise_error(StandardError) }
     end
   end
 end
@@ -145,12 +147,8 @@ def success_body
   { 'data' => [{ 'status' => 'ok' }] }
 end
 
-def success_receipt
+def receipt
   'YYYYYYYY-YYYY-YYYY-YYYY-YYYYYYYYYYYY'
-end
-
-def error_receipt
-  'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 end
 
 def receipt_success_body
@@ -166,11 +164,25 @@ end
 def receipt_error_body
   {
     'data' => {
-      'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX' => {
+      'YYYYYYYY-YYYY-YYYY-YYYY-YYYYYYYYYYYY' => {
         'status' => 'error',
         'message' => 'The Apple Push Notification service failed to send the notification',
         'details' => {
           'error' => 'DeviceNotRegistered'
+        }
+      }
+    }
+  }
+end
+
+def receipt_another_error_body
+  {
+    'data' => {
+      'YYYYYYYY-YYYY-YYYY-YYYY-YYYYYYYYYYYY' => {
+        'status' => 'error',
+        'message' => 'The Apple Push Notification service failed to send the notification',
+        'details' => {
+          'error' => 'AnotherError'
         }
       }
     }

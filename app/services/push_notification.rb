@@ -1,6 +1,7 @@
 # Class for sending push notifications to the RN App.
 class PushNotification
-  attr_reader :token, :sound, :body, :title, :handler, :client, :verified
+  attr_accessor :handler, :verified, :error_type, :error_message, :parsed_response
+  attr_reader :token, :sound, :body, :title, :client, :verified
 
   def initialize(token:, habit_name:, **args)
     raise ArgumentError, 'Token cannot be nil' if token.nil?
@@ -10,22 +11,28 @@ class PushNotification
     @token = token
     @title = habit_name
     @sound = args[:sound] || default_sound
-    @body = args[:body] || default_message
+    @body = args[:body] || default_body
   end
 
   def send
-    message = [{
-                 to: token,
-                 sound: sound,
-                 title: title,
-                 body: body
-               }]
-
     self.handler = client.send_messages(message)
+    return self unless handler.errors?
+
+    parse_response
+    raise DeviceNotRegistered, error_message if error_type == 'DeviceNotRegistered'
+
+    raise StandardError, error_message
   end
 
   def verify_delivery
-    self.verified = client.verify_deliveries(handler.receipt_ids)
+    receipt_ids = handler.receipt_ids
+    self.verified = client.verify_deliveries(receipt_ids)
+    return self unless verified.errors?
+
+    parse_response(index: receipt_ids.first, field: verified)
+    raise DeviceNotRegistered, error_message if error_type == 'DeviceNotRegistered'
+
+    raise StandardError, error_message
   end
 
   private
@@ -34,27 +41,24 @@ class PushNotification
     'default'
   end
 
-  def default_message
+  def default_body
     'Do the Habit!'
   end
 
-  def handler=(client_response)
-    @handler = client_response
-    return unless client_response.errors?
-
-    parsed_response = JSON.parse(client_response.response.response_body)
-    error_type = parsed_response.dig('data', 0, 'details', 'error')
-    error_message = parsed_response.dig('data', 0, 'message')
-    raise DeviceNotRegistered, error_message if error_type == 'DeviceNotRegistered'
-
-    raise StandardError, error_message
+  def message
+    [{
+      to: token,
+      sound: sound,
+      title: title,
+      body: body
+    }]
   end
-
-  def verified=(verification_response)
-    @verified == true unless
-
+  
+  def parse_response(index: 0, field: handler)
+    parsed_response = JSON.parse(field.response.response_body)
+    self.error_type = parsed_response.dig('data', index, 'details', 'error')
+    self.error_message = parsed_response.dig('data', index, 'message')
   end
-
 end
 
 # Error class for when the device token is invalid
