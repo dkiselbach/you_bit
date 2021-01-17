@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphQlMixins
   # Helper methods for habits within graphql
   module HelperMethods

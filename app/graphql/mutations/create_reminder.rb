@@ -9,7 +9,8 @@ module Mutations
 
     argument :remind_at, GraphQL::Types::ISO8601DateTime, required: true,
                                                           description: 'The time the User will be reminded of the Habit.'
-    argument :time_zone, String, required: true, description: "The Time Zone the user is in. Must be a valid time zone like 'America/New_York'"
+    argument :time_zone, String, required: true,
+                                 description: "The Time Zone the user is in. Must be a valid time zone like 'America/New_York'"
     argument :habit_id, ID, required: true,
                             description: 'The Habit to associate the Reminder with.'
 

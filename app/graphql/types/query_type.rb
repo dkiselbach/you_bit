@@ -19,7 +19,7 @@ module Types
                                                    description: 'Returns the Reminders of the signed in User.'
     field :habit, Types::HabitType, null: false, authenticate: true,
                                     description: 'Returns the Habit of the input Habit ID.' do
-      argument :habit_id, ID, required: true, description: "ID of the Habit."
+      argument :habit_id, ID, required: true, description: 'ID of the Habit.'
     end
 
     def user

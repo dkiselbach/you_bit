@@ -8,7 +8,8 @@ module Mutations
       include_context 'shared methods'
       let(:devices) { create_list(:device, 2, user: user) }
       let(:destroy_device_request) do
-        post '/graphql', params: { query: destroy_device_mutation(device_token: devices.first.token) }, headers: auth_headers
+        post '/graphql', params: { query: destroy_device_mutation(device_token: devices.first.token) },
+                         headers: auth_headers
       end
 
       context 'with valid device ID' do
@@ -26,14 +27,16 @@ module Mutations
 
       context 'with invalid ID' do
         it 'UserInputError is raised' do
-          post '/graphql', params: { query: destroy_device_mutation(device_token: Faker::Internet.uuid) }, headers: auth_headers
+          post '/graphql', params: { query: destroy_device_mutation(device_token: Faker::Internet.uuid) },
+                           headers: auth_headers
           expect(error_code).to eq('USER_INPUT_ERROR')
         end
       end
 
       context 'with user without access to habit' do
         it 'ForbiddenError is raised' do
-          post '/graphql', params: { query: destroy_device_mutation(device_token: devices.first.token) }, headers: forbidden_auth_headers
+          post '/graphql', params: { query: destroy_device_mutation(device_token: devices.first.token) },
+                           headers: forbidden_auth_headers
           expect(error_code).to eq('FORBIDDEN_ERROR')
         end
       end

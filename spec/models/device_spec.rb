@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Device, type: :model do
   let(:user) { create(:user) }
-  let(:args) { { token: Faker::Internet.uuid, platform: "iOS", user: user } }
+  let(:args) { { token: Faker::Internet.uuid, platform: 'iOS', user: user } }
 
   describe 'valid?' do
     subject(:device_errors) { described_class.create(**args).errors.messages }

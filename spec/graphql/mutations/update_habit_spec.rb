@@ -38,7 +38,8 @@ module Mutations
 
       context 'with invalid ID' do
         it 'UserInputError is raised' do
-          post '/graphql', params: { query: update_habit_mutation(user.habits.last.id + 100, **args) }, headers: auth_headers
+          post '/graphql', params: { query: update_habit_mutation(user.habits.last.id + 100, **args) },
+                           headers: auth_headers
           expect(error_code).to eq('USER_INPUT_ERROR')
         end
       end

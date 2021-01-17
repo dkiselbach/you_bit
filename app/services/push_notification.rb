@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Class for sending push notifications to the RN App.
 class PushNotification
   attr_accessor :handler, :verified, :error_type, :error_message, :parsed_response
@@ -21,7 +23,7 @@ class PushNotification
     parse_response
     raise DeviceNotRegistered, error_message if error_type == 'DeviceNotRegistered'
 
-    raise StandardError, error_message
+    raise ExpoPushNotificationError, error_message
   end
 
   def verify_delivery
@@ -32,7 +34,7 @@ class PushNotification
     parse_response(index: receipt_ids.first, field: verified)
     raise DeviceNotRegistered, error_message if error_type == 'DeviceNotRegistered'
 
-    raise StandardError, error_message
+    raise ExpoPushNotificationError, error_message
   end
 
   private
@@ -53,7 +55,7 @@ class PushNotification
       body: body
     }]
   end
-  
+
   def parse_response(index: 0, field: handler)
     parsed_response = JSON.parse(field.response.response_body)
     self.error_type = parsed_response.dig('data', index, 'details', 'error')
@@ -63,7 +65,8 @@ end
 
 # Error class for when the device token is invalid
 class DeviceNotRegistered < StandardError
-  def initialize(message)
-    super
-  end
+end
+
+# Error class for other expo errors
+class ExpoPushNotificationError < StandardError
 end

@@ -9,8 +9,7 @@ module Mutations
       let(:args) do
         { name: 'Run every day', description: 'Run everyday in the evening',
           type: 'goal', frequency: ['daily'], start_date: Date.new,
-          category_name: 'We like sports!'
-        }
+          category_name: 'We like sports!' }
       end
 
       it 'creates a habit' do

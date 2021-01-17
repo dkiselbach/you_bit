@@ -124,7 +124,7 @@ module Types
       context 'with user without access to habit' do
         it 'ForbiddenError is raised' do
           post '/graphql', params: { query: habit_query(habit_id: user.habits.last.id) },
-               headers: forbidden_auth_headers
+                           headers: forbidden_auth_headers
           expect(error_code).to eq('FORBIDDEN_ERROR')
         end
       end

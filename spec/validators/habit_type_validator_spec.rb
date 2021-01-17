@@ -4,7 +4,6 @@ require 'rails_helper'
 require_relative 'validatable'
 
 module Validators
-
   RSpec.describe HabitTypeValidator do
     let(:object) { Validatable.new }
 

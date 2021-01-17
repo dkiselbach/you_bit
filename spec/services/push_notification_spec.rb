@@ -3,10 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe PushNotification do
-  let(:args) {
+  let(:args) do
     { token: 'ExponentPushToken[GCPOCHK-aKfYgHzwiL_AQO]', habit_name: 'Run everyday', body: 'Run everyday!',
       sound: 'default' }
-  }
+  end
   let(:push) { described_class.new(token: args[:token], habit_name: args[:habit_name], **args) }
 
   describe 'initialize' do
@@ -189,36 +189,6 @@ def receipt_another_error_body
   }
 end
 
-def multiple_receipts
-  {
-    'data' => {
-      'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX' => {
-        'status' => 'error',
-        'message' => 'The Apple Push Notification service failed to send the notification',
-        'details' => {
-          'error' => 'DeviceNotRegistered'
-        }
-      },
-      'YYYYYYYY-YYYY-YYYY-YYYY-YYYYYYYYYYYY' => {
-        'status' => 'ok'
-      }
-    }
-  }
-end
-
-def error_body
-  {
-    'errors' => [{
-                   'code' => 'INTERNAL_SERVER_ERROR',
-                   'message' => 'An unknown error occurred.'
-                 }]
-  }
-end
-
-def message_too_big_error_body
-  build_error_body('MessageTooBig', 'Message too big')
-end
-
 def not_registered_device_error_body
   build_error_body(
     'DeviceNotRegistered',
@@ -226,137 +196,12 @@ def not_registered_device_error_body
   )
 end
 
-def message_rate_exceeded_error_body
-  build_error_body('MessageRateExceeded', 'Message rate exceeded')
-end
-
-def invalid_credentials_error_body
-  build_error_body('InvalidCredentials', 'Invalid credentials')
-end
-
-def apn_error_body
-  {
-    'data' => [{
-                 'status' => 'error',
-                 'message' =>
-                   'Could not find APNs credentials for you (your_app). Check whether you are trying to send a notification to a detached app.'
-               }]
-  }
-end
-
-def client_args
-  [
-    'https://exp.host/--/api/v2/push/send',
-    {
-      body: messages.to_json,
-      headers: {
-        'Content-Type' => 'application/json',
-        'Accept' => 'application/json'
-      },
-      accept_encoding: false
-    }
-  ]
-end
-
-def alternative_client_args(messages)
-  [
-    'https://exp.host/--/api/v2/push/send',
-    {
-      body: messages.to_json,
-      headers: {
-        'Content-Type' => 'application/json',
-        'Accept' => 'application/json'
-      },
-      accept_encoding: false
-    }
-  ]
-end
-
-def gzip_client_args
-  [
-    'https://exp.host/--/api/v2/push/send',
-    {
-      body: messages.to_json,
-      headers: {
-        'Content-Type' => 'application/json',
-        'Accept' => 'application/json'
-      },
-      accept_encoding: true
-    }
-  ]
-end
-
-def receipt_client_args(receipt_ids)
-  [
-    'https://exp.host/--/api/v2/push/getReceipts',
-    {
-      body: { ids: receipt_ids }.to_json,
-      headers: {
-        'Content-Type' => 'application/json',
-        'Accept' => 'application/json'
-      },
-      accept_encoding: false
-    }
-  ]
-end
-
-def gzip_receipt_client_args(receipt_ids)
-  [
-    'https://exp.host/--/api/v2/push/getReceipts',
-    {
-      body: { ids: receipt_ids }.to_json,
-      headers: {
-        'Content-Type' => 'application/json',
-        'Accept' => 'application/json'
-      },
-      accept_encoding: true
-    }
-  ]
-end
-
-def alternate_format_messages
-  [{
-     to: [
-       'ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]',
-       'ExponentPushToken[yyyyyyyyyyyyyyyyyyyyyy]'
-     ],
-     badge: 1,
-     sound: 'default',
-     body: 'You got a completely unique message from us! /s'
-   }]
-end
-
-def messages
-  [{
-     to: 'ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]',
-     sound: 'default',
-     body: 'Hello world!'
-   }, {
-     to: 'ExponentPushToken[yyyyyyyyyyyyyyyyyyyyyy]',
-     badge: 1,
-     body: "You've got mail"
-   }]
-end
-
-def too_many_messages
-  (0..101).map { create_message }
-end
-
-def create_message
-  id = (0...22).map { ('a'..'z').to_a[rand(26)] }.join
-  {
-    to: "ExponentPushToken[#{id}]",
-    sound: 'default',
-    body: 'Hello world!'
-  }
-end
-
 def build_error_body(error_code, message)
   {
     'data' => [{
-                 'status' => 'error',
-                 'message' => message,
-                 'details' => { 'error' => error_code }
-               }]
+      'status' => 'error',
+      'message' => message,
+      'details' => { 'error' => error_code }
+    }]
   }
 end

@@ -30,7 +30,8 @@ module Mutations
 
       context 'with user without access to habit' do
         it 'ForbiddenError is raised' do
-          post '/graphql', params: { query: destroy_habit_log_mutation(habits.last.id) }, headers: forbidden_auth_headers
+          post '/graphql', params: { query: destroy_habit_log_mutation(habits.last.id) },
+                           headers: forbidden_auth_headers
           error_code = JSON.parse(response.body).dig('errors', 0, 'extensions', 'code')
           expect(error_code).to eq('FORBIDDEN_ERROR')
         end

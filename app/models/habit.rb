@@ -193,7 +193,7 @@ class Habit < ApplicationRecord
                   COUNT(*) AS habit_streak,
                   MIN(logged_date) AS start_date,
                   MAX(logged_date) AS end_date,
-                  CASE 
+                  CASE#{' '}
                     WHEN logged_date - lag(logged_date) over (ORDER BY logged_date) IS NOT NULL THEN logged_date - lag(logged_date) over (ORDER BY logged_date)
                     ELSE 0
                   END AS limit_streak

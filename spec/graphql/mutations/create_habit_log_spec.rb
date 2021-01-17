@@ -7,9 +7,11 @@ module Mutations
     describe '.resolve' do
       include_context 'shared methods'
       let(:args) do
-        { habit_id: user.habits.first.id, logged_date: Date.new, habit_type: "goal" }
+        { habit_id: user.habits.first.id, logged_date: Date.new, habit_type: 'goal' }
       end
-      let(:create_habit_request) { post '/graphql', params: { query: create_habit_log_mutation(**args) }, headers: auth_headers }
+      let(:create_habit_request) do
+        post '/graphql', params: { query: create_habit_log_mutation(**args) }, headers: auth_headers
+      end
 
       context 'with valid params' do
         before do
@@ -34,7 +36,6 @@ module Mutations
           create_habit_request
           expect(error_code).to eq('VALIDATION_ERROR')
         end
-
       end
 
       context 'with invalid id' do
@@ -55,7 +56,7 @@ module Mutations
       context 'with user without access to habit' do
         it 'ForbiddenError is raised' do
           post '/graphql', params: { query: create_habit_log_mutation(**args) },
-               headers: forbidden_auth_headers
+                           headers: forbidden_auth_headers
           expect(error_code).to eq('FORBIDDEN_ERROR')
         end
       end

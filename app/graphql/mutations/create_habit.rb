@@ -19,7 +19,6 @@ module Mutations
                                      description: 'The Category for the Habit. This will create a new
                                                    Category if the Category does not exist.'
 
-
     def resolve(**attrs)
       habit = current_resource.habits.create(attrs)
 

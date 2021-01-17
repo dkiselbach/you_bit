@@ -140,21 +140,21 @@ RSpec.describe Habit, type: :model do
 
   describe '.limit?' do
     context 'when habit is limit' do
-      it { expect(limit_habit.limit?).to be_truthy }
+      it { expect(limit_habit).to be_limit }
     end
 
     context 'when habit is goal' do
-      it { expect(goal_habit.limit?).to be_falsey }
+      it { expect(goal_habit).not_to be_limit }
     end
   end
 
   describe '.goal?' do
     context 'when habit is goal' do
-      it { expect(goal_habit.goal?).to be_truthy }
+      it { expect(goal_habit).to be_goal }
     end
 
     context 'when habit is limit' do
-      it { expect(limit_habit.goal?).to be_falsey }
+      it { expect(limit_habit).not_to be_goal }
     end
   end
 
@@ -228,7 +228,6 @@ RSpec.describe Habit, type: :model do
       it 'deletes associated reminders' do
         create(:reminder, habit: user.habits.first)
         expect { described_class.first.update(frequency: ['monday']) }.to change(Reminder, :count).by(-1)
-
       end
     end
   end

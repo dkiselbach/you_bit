@@ -23,7 +23,7 @@ module Mutations
       end
 
       it 'returns user type' do
-        user_name, user_email = @response_body.dig('user').values_at('name', 'email')
+        user_name, user_email = @response_body['user'].values_at('name', 'email')
 
         expect({ name: user_name, email: user_email }).to eq({ name: @name, email: @email })
       end

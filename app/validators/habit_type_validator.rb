@@ -7,6 +7,6 @@ class HabitTypeValidator < ActiveModel::EachValidator
 
     return if types.include?(value)
 
-    record.errors.add(attribute, "Must be either 'goal' or 'limit'" )
+    record.errors.add(attribute, "Must be either 'goal' or 'limit'")
   end
 end

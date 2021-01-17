@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_context 'shared methods', shared_context: :metadata do
   subject(:error_code) { JSON.parse(response.body).dig('errors', 0, 'extensions', 'code') }
 

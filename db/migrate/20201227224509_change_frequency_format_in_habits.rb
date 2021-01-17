@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeFrequencyFormatInHabits < ActiveRecord::Migration[6.1]
   def change
     execute "alter table habits
