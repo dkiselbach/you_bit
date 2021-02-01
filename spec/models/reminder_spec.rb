@@ -29,49 +29,58 @@ RSpec.describe Reminder, type: :model do
   end
 
   describe '.enqueue_reminders' do
+    let(:time) { Time.new('2021', '02', '01', 0, 0, 0).utc } # Date is a Monday
+
     before do
       create(:device, user: user)
+      allow(Time).to receive(:now).and_return(time)
     end
 
     context 'when habit frequency is daily' do
-      it 'enqueues 7 reminders' do
-        expect { reminder }.to enqueue_job(PushNotificationJob).at_least(7).times
+      it 'enqueues 1 reminder' do
+        expect { reminder }.to enqueue_job(PushNotificationJob).at_least(1).times
+      end
+
+      it 'does not enqueue reminder if reminder time is in the past' do
+        args[:remind_at] = Time.now.utc - 1.minute
+        expect { reminder }.not_to enqueue_job(PushNotificationJob)
       end
     end
 
     context 'when habit frequency is one day' do
-      it 'enqueues 1 reminder' do
+      before do
         user.habits.first.update(frequency: ['monday'])
+      end
+
+      it 'enqueues 1 reminder if on correct day' do
         expect { reminder }.to enqueue_job(PushNotificationJob).at_least(1).times
+      end
+
+      it 'does not enqueue reminder if not on correct day' do
+        user.habits.first.update(frequency: ['tuesday'])
+        expect { reminder }.not_to enqueue_job(PushNotificationJob)
       end
     end
 
     context 'when habit frequency is two days' do
-      it 'enqueues 2 reminders' do
+      it 'enqueues 1 reminder if on first correct day' do
         user.habits.first.update(frequency: %w[monday tuesday])
-        expect { reminder }.to enqueue_job(PushNotificationJob).at_least(2).times
+        expect { reminder }.to enqueue_job(PushNotificationJob).at_least(1).times
       end
-    end
-  end
 
-  describe '.next_reminder' do
-    context 'when input is 7 days' do
-      it 'returns remind_at in 7 days' do
-        Time.zone = 'America/New_York'
-        time = Time.current
-        future_time = time + 7.days
-        args[:remind_at] = time
-        expect(reminder.next_reminder(days: 7)).to eq(Time.zone.local(future_time.year, future_time.month, future_time.day, future_time.hour, future_time.min, future_time.sec))
+      it 'does not enqueue reminder if not on correct day' do
+        user.habits.first.update(frequency: %w[tuesday wednesday])
+        expect { reminder }.not_to enqueue_job(PushNotificationJob)
       end
     end
 
-    context 'when input is 1 day' do
-      it 'returns remind_at in 1 days' do
-        Time.zone = 'America/New_York'
-        time = Time.current
-        future_time = time + 1.day
-        args[:remind_at] = time
-        expect(reminder.next_reminder(days: 1)).to eq(Time.zone.local(future_time.year, future_time.month, future_time.day, future_time.hour, future_time.min, future_time.sec))
+    context 'when user has multiple devices' do
+      before do
+        create_list(:device, 2, user: user)
+      end
+
+      it 'enqueues a reminder for each device' do
+        expect { reminder }.to enqueue_job(PushNotificationJob).at_least(3).times
       end
     end
   end

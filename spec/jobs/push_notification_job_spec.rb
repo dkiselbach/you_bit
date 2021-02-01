@@ -17,6 +17,22 @@ RSpec.describe PushNotificationJob, type: :job do
       end
     end
 
+    context 'when habit is no longer active' do
+      it 'halts job' do
+        invalid_reminder = reminder
+        invalid_reminder.habit.active = false
+        expect { described_class.perform_now(invalid_reminder, device) }.not_to have_enqueued_job
+      end
+    end
+
+    context 'when device no longer exists' do
+      it 'halts job' do
+        invalid_device = device
+        invalid_device.destroy
+        expect { described_class.perform_now(reminder, invalid_device) }.not_to have_enqueued_job
+      end
+    end
+
     context 'when reminder exists' do
       before do
         allow(PushNotification).to receive(:new).and_return(push)

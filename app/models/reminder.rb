@@ -7,42 +7,30 @@ class Reminder < ApplicationRecord
   belongs_to :habit
   after_save :enqueue_reminders
 
-  def enqueue_reminders
-    return unless habit.active
+  DAYS_OF_WEEK = %w[sunday monday tuesday wednesday thursday friday saturday].freeze
 
-    Time.zone = time_zone
+  def enqueue_reminders
+    return unless habit.active && (habit.frequency == ['daily'] || habit.frequency.include?(weekday))
+
+    remind_at = reminder_time
+    return if remind_at.nil?
 
     habit.user.devices.each do |device|
-      if habit.frequency == ['daily']
-        first_reminder = next_reminder(days: 0)
-        first_reminder_time = first_reminder || next_reminder
-        PushNotificationJob.set(wait_until: first_reminder_time).perform_later(self, device)
-        (1..6).each do |day|
-          PushNotificationJob.set(wait_until: next_reminder(days: day)).perform_later(self, device)
-        end
-      else
-        habit.frequency.each do |day|
-          date = remind_at.in_time_zone.next_week(day.to_sym)
-          time = remind_at.in_time_zone
-          reminder_time = Time.zone.local(date.year, date.month, date.day, time.hour, time.min, time.sec)
-
-          PushNotificationJob.set(wait_until: reminder_time).perform_later(self, device)
-        end
-      end
+      PushNotificationJob.set(wait_until: remind_at).perform_later(self, device)
     end
-
-    # Reminder.first.remind_at.next_week(:monday)
-
-    # If Daily, enqueue 7 reminders for the next 7 days. If not daily, enqueue each day of the week.
-    # Enqueued Job will enqueue another job the next week. Ensuring notifications are enqueued
-    # In perpetuity
   end
 
-  def next_reminder(days: 7)
+  private
+
+  def reminder_time
     Time.zone = time_zone
-    date = Time.current + days.days
+    date = Time.now.utc
     time = remind_at.in_time_zone
     reminder_time = Time.zone.local(date.year, date.month, date.day, time.hour, time.min, time.sec)
     reminder_time > Time.current ? reminder_time : nil
+  end
+
+  def weekday
+    DAYS_OF_WEEK[Time.now.utc.wday]
   end
 end
