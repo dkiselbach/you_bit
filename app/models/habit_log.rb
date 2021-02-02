@@ -26,7 +26,7 @@ class HabitLog < ApplicationRecord
 
     return if !habit.daily? && last_log.logged_date != last_log_date
 
-    last_streak = last_log.current_streak.nil? ? 0 : last_log.current_streak
+    last_streak = last_log.current_streak.nil? ? 1 : last_log.current_streak
 
     self.current_streak = last_streak + 1
   end
