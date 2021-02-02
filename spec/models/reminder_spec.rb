@@ -84,4 +84,17 @@ RSpec.describe Reminder, type: :model do
       end
     end
   end
+
+  describe '.schedule_all' do
+    context 'when reminders exist' do
+      before do
+        create_list(:reminder, 3, **args)
+        create_list(:device, 2, user: user)
+      end
+
+      it 'enqueues reminder jobs' do
+        expect { described_class.schedule_all }.to enqueue_job(PushNotificationJob).at_least(6).times
+      end
+    end
+  end
 end
