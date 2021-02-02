@@ -28,7 +28,15 @@ class Habit < ApplicationRecord
   end
 
   def longest_streak
-    sql = ActiveRecord::Base.sanitize_sql_array([LONGEST_STREAK_QUERY, id]) if goal?
+    if goal?
+      habit_log = HabitLog.where(habit_id: id).longest_streak
+      habit_streak = if habit_log.present?
+                       { 'habit_streak' => habit_log.current_streak, 'end_date' => habit_log.logged_date.to_s }
+                     else
+                       { 'habit_streak' => 0, 'end_date' => Date.current }
+                     end
+      return habit_streak
+    end
 
     sql = ActiveRecord::Base.sanitize_sql_array([LONGEST_LIMIT_STREAK_QUERY, start_date, Date.current, id]) if limit?
 
@@ -36,9 +44,17 @@ class Habit < ApplicationRecord
   end
 
   def current_streak(selected_date:)
-    sql = ActiveRecord::Base.sanitize_sql_array([CURRENT_STREAK_QUERY, id, selected_date, selected_date])
+    if goal?
+      habit_log = HabitLog.find_by(habit_id: id, logged_date: selected_date)
+      habit_streak = if habit_log.present?
+                       { 'habit_streak' => habit_log.current_streak, 'end_date' => habit_log.logged_date.to_s }
+                     else
+                       { 'habit_streak' => 0, 'end_date' => selected_date }
+                     end
+      return habit_streak
+    end
 
-    ActiveRecord::Base.connection.execute(sql).first
+    { 'habit_streak' => (selected_date.to_date - habit_logs.last.logged_date), 'end_date' => selected_date }
   end
 
   def limit?
@@ -47,6 +63,10 @@ class Habit < ApplicationRecord
 
   def goal?
     habit_type == 'goal'
+  end
+
+  def daily?
+    frequency == ['daily']
   end
 
   private
@@ -171,15 +191,15 @@ class Habit < ApplicationRecord
   CURRENT_LIMIT_STREAK_QUERY = <<-SQL
                   WITH distinct_dates AS (
                     SELECT
-                      '2020-10-01'::DATE as logged_date
+                      ?::DATE as logged_date
                     UNION ALL
                     SELECT
-                      '2021-01-12'::DATE as logged_date
+                      ?::DATE as logged_date
                     UNION ALL
                     SELECT DISTINCT
                       logged_date
                     FROM habit_logs
-                    WHERE habit_id = 4
+                    WHERE habit_id = '?'
                     ORDER BY logged_date DESC
                   ),
                   groups AS (
@@ -190,16 +210,15 @@ class Habit < ApplicationRecord
                   FROM distinct_dates
                 )
                 SELECT
-                  COUNT(*) AS habit_streak,
                   MIN(logged_date) AS start_date,
                   MAX(logged_date) AS end_date,
-                  CASE#{' '}
+                  CASE
                     WHEN logged_date - lag(logged_date) over (ORDER BY logged_date) IS NOT NULL THEN logged_date - lag(logged_date) over (ORDER BY logged_date)
                     ELSE 0
-                  END AS limit_streak
+                  END AS habit_streak
                 FROM groups
                 GROUP BY grp, logged_date
-                ORDER BY start_date DESC
+                ORDER BY habit_streak DESC, start_date DESC
                 LIMIT 1;
   SQL
 end

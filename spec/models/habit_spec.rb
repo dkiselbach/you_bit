@@ -158,6 +158,19 @@ RSpec.describe Habit, type: :model do
     end
   end
 
+  describe '.daily?' do
+    context 'when habit is daily' do
+      it { expect(goal_habit).to be_daily }
+    end
+
+    context 'when habit is not daily' do
+      it do
+        goal_habit.update(frequency: ['monday'])
+        expect(goal_habit).not_to be_daily
+      end
+    end
+  end
+
   describe '.logged' do
     context 'when habit is logged' do
       it 'returns hash' do

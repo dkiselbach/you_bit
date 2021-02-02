@@ -208,12 +208,10 @@ def habits_index_query(**args)
         }
         longestStreak {
           habitStreak
-          startDate
           endDate
         }
         currentStreak(selectedDate: "#{args[:selected_date]}") {
           habitStreak
-          startDate
           endDate
         }
         habitLogs {

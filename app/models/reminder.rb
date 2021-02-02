@@ -10,7 +10,7 @@ class Reminder < ApplicationRecord
   DAYS_OF_WEEK = %w[sunday monday tuesday wednesday thursday friday saturday].freeze
 
   def enqueue_reminders
-    return unless habit.active && (habit.frequency == ['daily'] || habit.frequency.include?(weekday))
+    return unless habit.active && (habit.daily? || habit.frequency.include?(weekday))
 
     remind_at = reminder_time
     return if remind_at.nil?

@@ -27,4 +27,48 @@ RSpec.describe HabitLog, type: :model do
       expect(Habit.first.habit_logs.most_recent.logged_date).to eq(habit_log.logged_date)
     end
   end
+
+  describe 'after_create' do
+    context 'when habit is goal and frequency is daily' do
+      before do
+        (0..4).to_a.reverse_each do |day|
+          user.habits.first.habit_logs.create(habit_type: 'goal', logged_date: Date.current - day)
+        end
+      end
+
+      it 'logs current habit streak' do
+        expect(described_class.most_recent.current_streak).to eq(5)
+      end
+    end
+
+    context 'when habit is goal and frequency is not daily' do
+      before do
+        last_monday = Date.new(2021, 1, 25)
+        last_wednesday = Date.new(2021, 1, 27)
+        last_thursday = Date.new(2021, 1, 28)
+        this_monday = Date.new(2021, 2, 1)
+        user.habits.first.update(frequency: %w[monday wednesday thursday])
+        user.habits.first.habit_logs.create(habit_type: 'goal', logged_date: last_monday)
+        user.habits.first.habit_logs.create(habit_type: 'goal', logged_date: last_wednesday)
+        user.habits.first.habit_logs.create(habit_type: 'goal', logged_date: last_thursday)
+        user.habits.first.habit_logs.create(habit_type: 'goal', logged_date: this_monday)
+      end
+
+      it 'logs current habit streak' do
+        expect(described_class.most_recent.current_streak).to eq(4)
+      end
+    end
+
+    context 'when habit is limit' do
+      before do
+        (0..5).to_a.reverse_each do |day|
+          user.habits.first.habit_logs.create(habit_type: 'limit', logged_date: Date.new - day)
+        end
+      end
+
+      it 'does not log current streak' do
+        expect(described_class.most_recent.current_streak).to be_nil
+      end
+    end
+  end
 end

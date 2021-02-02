@@ -12,9 +12,9 @@ module Types
     field :category, Types::CategoryType, null: false, description: 'The Category associated with the Habit.'
     field :start_date, GraphQL::Types::ISO8601Date, null: false, description: 'The Habit Start Date.'
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false,
-                                                        description: 'The DateTime value of when the Habit was created.'
+          description: 'The DateTime value of when the Habit was created.'
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false,
-                                                        description: 'The DateTime value of when the Habit was updated.'
+          description: 'The DateTime value of when the Habit was updated.'
     field :habit_logs, [Types::HabitLogType], null: true, description: 'Logs for the Habit.'
     field :reminders, [Types::ReminderType], null: true, description: 'Reminders for the Habit.'
     field :is_logged, Types::IsLoggedType, null: false, description: 'If the Habit has been Logged.' do
