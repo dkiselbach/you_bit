@@ -30,6 +30,7 @@ RSpec.describe HabitLog, type: :model do
 
   describe 'after_create' do
     context 'when habit is goal and frequency is daily' do
+      subject(:current_streak) { described_class.most_recent.current_streak }
       before do
         (0..4).to_a.reverse_each do |day|
           user.habits.first.habit_logs.create(habit_type: 'goal', logged_date: Date.current - day)
@@ -37,7 +38,18 @@ RSpec.describe HabitLog, type: :model do
       end
 
       it 'logs current habit streak' do
-        expect(described_class.most_recent.current_streak).to eq(5)
+        expect(current_streak).to eq(5)
+      end
+
+      it 'starts new streak at 1 if streak broken' do
+        user.habits.first.habit_logs.create(habit_type: 'goal', logged_date: Date.current + 2.days)
+        expect(current_streak).to eq(1)
+      end
+
+      it 'sets streak to 1 if last streak is nil' do
+        described_class.most_recent.update(current_streak: nil)
+        user.habits.first.habit_logs.create(habit_type: 'goal', logged_date: Date.current + 1.day)
+        expect(current_streak).to eq(2)
       end
     end
 

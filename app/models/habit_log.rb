@@ -22,11 +22,11 @@ class HabitLog < ApplicationRecord
       return
     end
 
-    return if habit.daily? && (logged_date - last_log.logged_date).to_i != 1
+    last_streak = 0 if habit.daily? && (logged_date - last_log.logged_date).to_i != 1
 
-    return if !habit.daily? && last_log.logged_date != last_log_date
+    last_streak = 0 if !habit.daily? && last_log.logged_date != last_log_date
 
-    last_streak = last_log.current_streak.nil? ? 1 : last_log.current_streak
+    last_streak ||= last_log.current_streak.nil? ? 1 : last_log.current_streak
 
     self.current_streak = last_streak + 1
   end
