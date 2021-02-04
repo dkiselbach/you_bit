@@ -57,7 +57,7 @@ class Habit < ApplicationRecord
     last_habit = habit_logs.last
     last_habit_logged_date = last_habit.nil? ? start_date : last_habit.logged_date
 
-    { 'habit_streak' => (selected_date.to_date - last_habit_logged_date), 'end_date' => selected_date }
+    { 'habit_streak' => (selected_date.to_date - last_habit_logged_date + 1), 'end_date' => selected_date }
   end
 
   def limit?
