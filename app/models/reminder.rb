@@ -35,8 +35,8 @@ class Reminder < ApplicationRecord
   def reminder_time
     # scheduler is set for everyday at 12:00 AM UTC. Use UTC for the date unless the method was
     # called from a new reminder being created.
-    date = scheduler == 'daily_scheduler' ? Time.now.in_time_zone('UTC') : Time.now.in_time_zone(time_zone)
     Time.zone = time_zone
+    date = scheduler == 'daily_scheduler' ? Time.now.in_time_zone('UTC') : Time.now.in_time_zone
     time = remind_at.in_time_zone
     reminder_time = Time.zone.local(date.year, date.month, date.day, time.hour, time.min, time.sec)
     reminder_time > Time.current ? reminder_time : nil

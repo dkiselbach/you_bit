@@ -2,6 +2,7 @@
 
 # Job for sending push notifications to the user's device.
 class PushNotificationJob < ApplicationJob
+  sidekiq_options retry: false
   def perform(reminder, device)
     reminder = Reminder.find_by(id: reminder.id)
     device = Device.find_by(id: device.id)
