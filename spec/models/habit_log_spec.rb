@@ -31,6 +31,7 @@ RSpec.describe HabitLog, type: :model do
   describe 'after_create' do
     context 'when habit is goal and frequency is daily' do
       subject(:current_streak) { described_class.most_recent.current_streak }
+
       before do
         (0..4).to_a.reverse_each do |day|
           user.habits.first.habit_logs.create(habit_type: 'goal', logged_date: Date.current - day)

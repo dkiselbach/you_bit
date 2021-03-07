@@ -45,7 +45,7 @@ RSpec.describe PushNotificationJob, type: :job do
         expect(push).to have_received(:send)
       end
 
-      #it { expect(push).to have_received(:verify_delivery) }
+      # it { expect(push).to have_received(:verify_delivery) }
     end
   end
 
