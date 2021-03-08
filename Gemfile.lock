@@ -277,7 +277,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord (>= 6.1.2.1)
   bootsnap (>= 1.4.4)
   byebug
   devise
