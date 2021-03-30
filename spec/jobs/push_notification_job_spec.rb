@@ -9,37 +9,45 @@ RSpec.describe PushNotificationJob, type: :job do
   let(:push) { instance_double(PushNotification) }
 
   describe '.perform' do
+    before do
+      allow(PushNotification).to receive(:new).and_return(push)
+      allow(push).to receive(:send).and_return(push)
+      # allow(PushNotification).to receive(:verify_delivery) { push }
+    end
+
     context 'when reminder no longer exists' do
       it 'halts job' do
-        invalid_reminder = reminder
-        invalid_reminder.destroy
-        expect { described_class.perform_now(invalid_reminder, device) }.not_to have_enqueued_job
+        reminder.destroy
+        described_class.perform_now(reminder, device)
+        expect(push).not_to have_received(:send)
       end
     end
 
     context 'when habit is no longer active' do
       it 'halts job' do
-        invalid_reminder = reminder
-        invalid_reminder.habit.active = false
-        expect { described_class.perform_now(invalid_reminder, device) }.not_to have_enqueued_job
+        reminder.habit.update(active: false)
+        described_class.perform_now(reminder, device)
+        expect(push).not_to have_received(:send)
+      end
+    end
+
+    context 'when habit is already logged' do
+      it 'halts job' do
+        create(:habit_log, habit: reminder.habit, logged_date: Date.current)
+        described_class.perform_now(reminder, device)
+        expect(push).not_to have_received(:send)
       end
     end
 
     context 'when device no longer exists' do
       it 'halts job' do
-        invalid_device = device
-        invalid_device.destroy
-        expect { described_class.perform_now(reminder, invalid_device) }.not_to have_enqueued_job
+        device.destroy
+        described_class.perform_now(reminder, device)
+        expect(push).not_to have_received(:send)
       end
     end
 
     context 'when reminder exists' do
-      before do
-        allow(PushNotification).to receive(:new).and_return(push)
-        allow(push).to receive(:send).and_return(push)
-        # allow(PushNotification).to receive(:verify_delivery) { push }
-      end
-
       it 'sends push notification' do
         described_class.perform_now(reminder, device)
         expect(push).to have_received(:send)
@@ -56,7 +64,7 @@ RSpec.describe PushNotificationJob, type: :job do
     end
 
     context 'when token is invalid' do
-      it 'invalid devise is removed' do
+      it 'invalid device is removed' do
         device
         expect { described_class.perform_now(reminder, device) }.to change(Device, :count).by(-1)
       end
